@@ -1,0 +1,286 @@
+;; vim: expandtab shiftwidth=2
+
+;;; PACKAGE MANAGEMENT ---------------------------------------------------------
+
+;; setup straight.el
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+      (bootstrap-version 6))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
+
+;; setup use-package
+(straight-use-package 'use-package)
+(use-package straight
+  :custom (straight-use-package-by-default t))
+
+;;; APPEARANCE -----------------------------------------------------------------
+
+;; vanilla stuff - menu-bar-mode is in early-init
+(blink-cursor-mode 0)
+(scroll-bar-mode   0)
+(tool-bar-mode     0)
+(set-frame-font "IosevkaNerdFontMono")
+
+;; line numbers
+(global-display-line-numbers-mode 1)
+(setq display-line-numbers-type 'relative)
+(set-face-background 'line-number nil)
+
+;; theme
+(use-package gruvbox-theme
+  :custom (custom-safe-themes '("72ed8b6bffe0bfa8d097810649fd57d2b598deef47c992920aef8b5d9599eefe" default))
+  :config (load-theme 'gruvbox-dark-medium))
+
+;; dashboard
+(defun my/dashboard-setup ())
+(use-package dashboard
+  :custom
+  (dashboard-banner-logo-title "Welcome back, Eleonora!")
+  (dashboard-startup-banner (expand-file-name "splash.png" user-emacs-directory))
+  (dashboard-set-footer nil)
+  (dashboard-items nil)
+  :config
+  (dashboard-setup-startup-hook)
+  (add-hook
+   'after-init-hook
+   (lambda ()
+     (dashboard--with-buffer
+       (setq-local cursor-type nil)
+       (beginning-of-buffer)
+       (newline
+        (/
+         (-
+          (window-height)
+          (count-lines (point-min) (point-max))
+          5)
+         2))))
+   100))
+
+;; modeline
+(use-package telephone-line :config (telephone-line-mode 1))
+
+;; completion UI
+(use-package vertico
+  :custom
+  (vertico-count 30)
+  (vertico-cycle t)
+  :config (vertico-mode 1))
+
+;; better syntax highlighting
+(use-package tree-sitter
+  :config (global-tree-sitter-mode)
+  :hook (tree-sitter-after-on . tree-sitter-hl-mode))
+(use-package tree-sitter-langs)
+
+;;; POPUP CONTROL --------------------------------------------------------------
+
+(use-package popwin
+  :config
+  (push "*undo-tree*" popwin:special-display-config)
+  (push "*Backtrace*" popwin:special-display-config)
+  (push "*Help*"      popwin:special-display-config)
+  (popwin-mode 1))
+
+;;; TEMPORARY FILES ------------------------------------------------------------
+
+(setq my/temp-dir (concat user-emacs-directory "temp/")
+      backup-directory-alist         `(("." . ,my/temp-dir))
+      auto-save-file-name-transforms `((".*"  ,my/temp-dir t))
+      auto-save-list-file-prefix               my/temp-dir)
+
+;;; INFORMATION TOOLS ----------------------------------------------------------
+
+;; show keybindings on input
+(use-package which-key
+  :custom
+  (which-key-idle-delay 0.5)
+  (which-key-idle-secondary-delay 0)
+  :config (which-key-mode 1))
+
+;; frecency-based sorting
+(use-package prescient
+  :config (prescient-persist-mode 1)
+  :custom (prescient-save-file (concat my/temp-dir "prescient-save.el")))
+(use-package vertico-prescient :config (vertico-prescient-mode 1))
+
+;; better selection functions
+(use-package consult :init (recentf-mode))
+
+;; extra info in some completions
+(use-package marginalia :config (marginalia-mode 1))
+
+;; better parenthesis
+(use-package rainbow-delimiters
+  :hook prog-mode
+  :config
+  (set-face-foreground 'rainbow-delimiters-depth-1-face "#ff0000")
+  (set-face-foreground 'rainbow-delimiters-depth-2-face "#fc4444")
+  (set-face-foreground 'rainbow-delimiters-depth-3-face "#fc6404")
+  (set-face-foreground 'rainbow-delimiters-depth-4-face "#fcd444")
+  (set-face-foreground 'rainbow-delimiters-depth-5-face "#8cc43c")
+  (set-face-foreground 'rainbow-delimiters-depth-6-face "#029658")
+  (set-face-foreground 'rainbow-delimiters-depth-7-face "#1abc9c")
+  (set-face-foreground 'rainbow-delimiters-depth-8-face "#5bc0de")
+  (set-face-foreground 'rainbow-delimiters-depth-9-face "#6454ac"))
+
+;; git gutter
+(use-package git-gutter
+  :custom
+  (git-gutter:added-sign    "+")
+  (git-gutter:modified-sign "~")
+  (git-gutter:deleted-sign  "-")
+  :config
+  (set-face-background 'git-gutter:added    nil)
+  (set-face-background 'git-gutter:modified nil)
+  (set-face-background 'git-gutter:deleted  nil)
+  (global-git-gutter-mode 1))
+
+;;; EDITING --------------------------------------------------------------------
+
+(cua-mode 1)
+
+(use-package multiple-cursors)
+
+;; jump to things
+(use-package avy
+  :custom
+  (avy-keys
+   (nconc
+    (number-sequence ?a ?z)
+    (number-sequence ?A ?Z)
+    (number-sequence ?1 ?9)
+    '(?0))))
+
+;; better undo
+(use-package undo-tree
+  :custom (undo-tree-history-directory-alist `(("." . ,my/temp-dir)))
+  :config (global-undo-tree-mode 1))
+
+;;; PROGRAMMING BASICS ---------------------------------------------------------
+
+(use-package project)
+
+;; autocompletion
+(use-package company
+  :hook (after-init . global-company-mode)
+  :custom
+  (company-dabbrev-downcase nil)
+  (company-dabbrev-ignore-case t)
+  (company-idle-delay 0)
+  (company-minimum-prefix-length 1)
+  (company-show-numbers t))
+
+;; language server support
+(use-package lsp-mode
+  :custom
+  (lsp-headerline-breadcrumb-enable nil)
+  :hook
+  (haskell-mode . lsp-deferred))
+
+(use-package lsp-ui
+  :custom
+  (lsp-ui-sideline-show-code-actions t)
+  (lsp-ui-sideline-show-diagnostics t)
+  (lsp-ui-sideline-show-hover t)
+  (lsp-ui-sideline-show-symbol t))
+
+;; formatting
+(use-package format-all
+  :hook prog-mode
+  (format-all-mode . format-all-ensure-formatter)
+  :config
+  (push '("Haskell" stylish-haskell) format-all-default-formatters))
+
+;;; LANGUAGES ------------------------------------------------------------------
+
+;; lisp
+(use-package parinfer-rust-mode
+  :hook emacs-lisp-mode
+  :custom
+  (parinfer-rust-library-directory my/temp-dir)
+  (parinfer-rust-auto-download t))
+
+;; haskell
+(use-package haskell-mode)
+(use-package lsp-haskell)
+
+;;; KEYBINDINGS ----------------------------------------------------------------
+
+;; remove all existing keybinds
+(setq my-global-map (make-keymap))
+(substitute-key-definition
+ 'self-insert-command 'self-insert-command
+ my-global-map global-map)
+;;(use-global-map my-global-map)
+
+(defmacro my/bind-keys* (&rest body)
+  "Globally bind all keys. BODY: a list of alternating key-function arguments."
+  `(progn
+     ,@(cl-loop
+        while body collecting
+        `(bind-key* ,(pop body) ,(pop body)))))
+
+(my/bind-keys*
+ ;; menus
+ "C-x C-f" #'find-file
+ "C-x C-k" #'kill-buffer
+ "C-x C-s" #'consult-buffer
+ "C-x C-u" #'undo-tree-visualize
+ "M-x"     #'execute-extended-command
+
+ ;; window control
+ "C-x C-0" #'delete-window
+ "C-x C-1" #'delete-other-windows
+ "C-x C-2"
+ (lambda ()
+   (interactive)
+   (split-window-below)
+   (balance-windows)
+   (other-window 1))
+ "C-x C-3"
+ (lambda ()
+   (interactive)
+   (split-window-right)
+   (balance-windows)
+   (other-window 1))
+
+ ;; movement
+ "C-#"   #'next-window-any-frame
+ "C-M-#" #'previous-window-any-frame
+ "M-c"   #'avy-goto-word-1
+ "M-l"   #'consult-goto-line
+ "M-n"   #'scroll-up-command
+ "M-p"   #'scroll-down-command
+ "M-s"   #'consult-line
+
+ ;; editing
+ "C-,"     #'mc/mark-previous-like-this
+ "C-."     #'mc/mark-next-like-this
+ "C-<tab>" #'format-all-buffer
+ "C-s"     #'save-buffer
+ "C-y"     #'undo-tree-redo
+ "C-z"     #'undo-tree-undo
+
+ ;; haskell
+ "C-x C-h" #'haskell-interactive-switch
+
+ ;; help
+ "C-h C-f" #'describe-function
+ "C-h C-k" #'describe-key
+ "C-h C-v" #'describe-variable
+ "C-h C-b" #'describe-personal-keybindings)
+
+;;; FINAL CLEANUP --------------------------------------------------------------
+
+(add-hook
+  'dashboard-after-initialize-hook
+  (lambda () (message nil)))
+(setq inhibit-redisplay nil)
