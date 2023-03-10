@@ -122,9 +122,7 @@
 
 ;; indent guides
 (use-package highlight-indent-guides
-  :custom
-  ;;(highlight-indent-guides-method 'character)
-  (highlight-indent-guides-responsive 'stack)
+  :custom (highlight-indent-guides-responsive 'stack)
   :hook (prog-mode . highlight-indent-guides-mode))
 
 ;; show whitespace
@@ -178,8 +176,7 @@
 ;; better parenthesis
 (use-package rainbow-delimiters
   :hook prog-mode
-  :custom
-  (rainbow-delimiters-max-face-count 6)
+  :custom (rainbow-delimiters-max-face-count 6)
   :config
   (set-face-foreground 'rainbow-delimiters-depth-1-face "#e50000")
   (set-face-foreground 'rainbow-delimiters-depth-2-face "#ff8d00")
@@ -241,8 +238,7 @@
 
 ;; language server support
 (use-package lsp-mode
-  :custom
-  (lsp-headerline-breadcrumb-enable nil)
+  :custom (lsp-headerline-breadcrumb-enable nil)
   :hook
   (go-mode      . lsp-deferred)
   (haskell-mode . lsp-deferred))
@@ -273,8 +269,7 @@
 
 ;; haskell
 (use-package haskell-mode
-  :bind
-  (:map haskell-mode-map ("C-x C-p" . #'haskell-interactive-switch))
+  :bind (:map haskell-mode-map ("C-x C-p" . #'haskell-interactive-switch))
   :hook
   (haskell-interactive-mode
    . (lambda ()
@@ -297,7 +292,8 @@
 ;;(use-global-map my-global-map)
 
 (defmacro my/bind-keys* (&rest body)
-  "Globally bind all keys. BODY: a list of alternating key-function arguments."
+  "Globally bind all keys.
+  BODY: a list of alternating key-function arguments."
   `(progn
      ,@(cl-loop
         while body collecting
