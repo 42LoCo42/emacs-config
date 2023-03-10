@@ -244,6 +244,7 @@
   :custom
   (lsp-headerline-breadcrumb-enable nil)
   :hook
+  (go-mode      . lsp-deferred)
   (haskell-mode . lsp-deferred))
 
 (use-package lsp-ui
@@ -281,6 +282,10 @@
        (bind-key "C-n" #'haskell-interactive-mode-history-next     'haskell-interactive-mode-map))))
 
 (use-package lsp-haskell)
+
+;; golang
+(use-package go-mode
+  :bind (:map go-mode-map ("C-x C-p" . #'my/switch-to-terminal)))
 
 ;;; KEYBINDINGS ----------------------------------------------------------------
 
