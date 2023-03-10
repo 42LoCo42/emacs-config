@@ -27,6 +27,7 @@
 (blink-cursor-mode 0)
 (scroll-bar-mode   0)
 (tool-bar-mode     0)
+(global-prettify-symbols-mode 1)
 (set-frame-font "IosevkaNerdFontMono")
 (setq use-dialog-box nil)
 (defalias 'yes-or-no-p 'y-or-n-p)
