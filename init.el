@@ -31,7 +31,8 @@
 (global-prettify-symbols-mode 1)
 (set-frame-font "IosevkaNerdFontMono")
 (setq use-dialog-box nil
-      server-client-instructions nil)
+      server-client-instructions nil
+      inhibit-startup-screen t)
 (defalias 'yes-or-no-p 'y-or-n-p)
 
 ;; line numbers
@@ -68,6 +69,7 @@
        5)
       2))
     (message nil)))
+(add-hook 'after-init-hook #'my/dashboard)
 
 ;; modeline
 (use-package telephone-line :config (telephone-line-mode 1))
