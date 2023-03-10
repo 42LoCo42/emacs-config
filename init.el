@@ -108,6 +108,11 @@
 
 ;;; INFORMATION TOOLS ----------------------------------------------------------
 
+;; fill column
+(add-hook 'display-fill-column-indicator-mode-hook
+          (lambda () (set-fill-column 80)))
+(global-display-fill-column-indicator-mode)
+
 ;; show keybindings on input
 (use-package which-key
   :custom
