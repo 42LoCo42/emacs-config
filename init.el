@@ -33,6 +33,7 @@
 (setq use-dialog-box nil
       server-client-instructions nil
       inhibit-startup-screen t)
+(setq-default tab-width 4)
 (defalias 'yes-or-no-p 'y-or-n-p)
 
 ;; line numbers
@@ -93,6 +94,11 @@
   ;;(highlight-indent-guides-method 'character)
   (highlight-indent-guides-responsive 'stack)
   :hook (prog-mode . highlight-indent-guides-mode))
+
+;; show whitespace
+(use-package whitespace
+  :config (global-whitespace-mode 1)
+  :custom (whitespace-style '(face tab-mark trailing missig-newline-at-eof)))
 
 ;;; POPUP CONTROL --------------------------------------------------------------
 
