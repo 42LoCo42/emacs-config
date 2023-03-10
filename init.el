@@ -28,6 +28,8 @@
 (scroll-bar-mode   0)
 (tool-bar-mode     0)
 (set-frame-font "IosevkaNerdFontMono")
+(setq use-dialog-box nil)
+(defalias 'yes-or-no-p 'y-or-n-p)
 
 ;; line numbers
 (global-display-line-numbers-mode 1)
@@ -40,7 +42,6 @@
   :config (load-theme 'gruvbox-dark-medium))
 
 ;; dashboard
-(defun my/dashboard-setup ())
 (use-package dashboard
   :custom
   (dashboard-banner-logo-title "Welcome back, Eleonora!")
@@ -48,6 +49,7 @@
   (dashboard-set-footer nil)
   (dashboard-items nil)
   :config
+  (set-face-attribute 'dashboard-banner-logo-title nil :height 200)
   (dashboard-setup-startup-hook)
   (add-hook
    'after-init-hook
@@ -76,17 +78,25 @@
 
 ;; better syntax highlighting
 (use-package tree-sitter
-  :config (global-tree-sitter-mode)
+  :config (global-tree-sitter-mode 1)
   :hook (tree-sitter-after-on . tree-sitter-hl-mode))
 (use-package tree-sitter-langs)
+
+;; indent guides
+(use-package highlight-indent-guides
+  :custom
+  ;;(highlight-indent-guides-method 'character)
+  (highlight-indent-guides-responsive 'stack)
+  :hook (prog-mode . highlight-indent-guides-mode))
 
 ;;; POPUP CONTROL --------------------------------------------------------------
 
 (use-package popwin
   :config
-  (push "*undo-tree*" popwin:special-display-config)
+  ;;(push "*undo-tree*" popwin:special-display-config)
+  ;;(push "*Help*"      popwin:special-display-config)
   (push "*Backtrace*" popwin:special-display-config)
-  (push "*Help*"      popwin:special-display-config)
+  (push '("^[*]" :regex t) popwin:special-display-config)
   (popwin-mode 1))
 
 ;;; TEMPORARY FILES ------------------------------------------------------------
@@ -112,7 +122,7 @@
 (use-package vertico-prescient :config (vertico-prescient-mode 1))
 
 ;; better selection functions
-(use-package consult :init (recentf-mode))
+(use-package consult :init (recentf-mode 1))
 
 ;; extra info in some completions
 (use-package marginalia :config (marginalia-mode 1))
@@ -120,16 +130,15 @@
 ;; better parenthesis
 (use-package rainbow-delimiters
   :hook prog-mode
+  :custom
+  (rainbow-delimiters-max-face-count 6)
   :config
-  (set-face-foreground 'rainbow-delimiters-depth-1-face "#ff0000")
-  (set-face-foreground 'rainbow-delimiters-depth-2-face "#fc4444")
-  (set-face-foreground 'rainbow-delimiters-depth-3-face "#fc6404")
-  (set-face-foreground 'rainbow-delimiters-depth-4-face "#fcd444")
-  (set-face-foreground 'rainbow-delimiters-depth-5-face "#8cc43c")
-  (set-face-foreground 'rainbow-delimiters-depth-6-face "#029658")
-  (set-face-foreground 'rainbow-delimiters-depth-7-face "#1abc9c")
-  (set-face-foreground 'rainbow-delimiters-depth-8-face "#5bc0de")
-  (set-face-foreground 'rainbow-delimiters-depth-9-face "#6454ac"))
+  (set-face-foreground 'rainbow-delimiters-depth-1-face "#e50000")
+  (set-face-foreground 'rainbow-delimiters-depth-2-face "#ff8d00")
+  (set-face-foreground 'rainbow-delimiters-depth-3-face "#ffee00")
+  (set-face-foreground 'rainbow-delimiters-depth-4-face "#008121")
+  (set-face-foreground 'rainbow-delimiters-depth-5-face "#004cff")
+  (set-face-foreground 'rainbow-delimiters-depth-6-face "#760188"))
 
 ;; git gutter
 (use-package git-gutter
@@ -209,16 +218,24 @@
   (parinfer-rust-auto-download t))
 
 ;; haskell
-(use-package haskell-mode)
+(use-package haskell-mode
+  :bind
+  (:map haskell-mode-map ("C-x C-p" . #'haskell-interactive-switch))
+  :hook
+  (haskell-interactive-mode
+   . (lambda ()
+       (bind-key "C-p" #'haskell-interactive-mode-history-previous 'haskell-interactive-mode-map)
+       (bind-key "C-n" #'haskell-interactive-mode-history-next     'haskell-interactive-mode-map))))
+
 (use-package lsp-haskell)
 
 ;;; KEYBINDINGS ----------------------------------------------------------------
 
 ;; remove all existing keybinds
-(setq my-global-map (make-keymap))
-(substitute-key-definition
- 'self-insert-command 'self-insert-command
- my-global-map global-map)
+;;(setq my-global-map (make-keymap))
+;;(substitute-key-definition
+;; 'self-insert-command 'self-insert-command
+;; my-global-map global-map)
 ;;(use-global-map my-global-map)
 
 (defmacro my/bind-keys* (&rest body)
@@ -234,7 +251,6 @@
  "C-x C-k" #'kill-buffer
  "C-x C-s" #'consult-buffer
  "C-x C-u" #'undo-tree-visualize
- "M-x"     #'execute-extended-command
 
  ;; window control
  "C-x C-0" #'delete-window
@@ -269,18 +285,15 @@
  "C-y"     #'undo-tree-redo
  "C-z"     #'undo-tree-undo
 
- ;; haskell
- "C-x C-h" #'haskell-interactive-switch
-
  ;; help
+ "C-h C-b" #'describe-personal-keybindings
  "C-h C-f" #'describe-function
  "C-h C-k" #'describe-key
- "C-h C-v" #'describe-variable
- "C-h C-b" #'describe-personal-keybindings)
+ "C-h C-v" #'describe-variable)
 
 ;;; FINAL CLEANUP --------------------------------------------------------------
 
 (add-hook
-  'dashboard-after-initialize-hook
-  (lambda () (message nil)))
+ 'dashboard-after-initialize-hook
+ (lambda () (message nil)))
 (setq inhibit-redisplay nil)
