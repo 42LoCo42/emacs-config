@@ -53,11 +53,11 @@
   "Create or switch to the terminal buffer"
   (interactive)
   (let ((term-win (get-buffer-window "*eat*")))
-    (if (eq term-win nil)
-     (progn
-       (my/split-switch-right)
-       (my/terminal))
-     (select-window term-win))))
+    (if (eq term-win nil
+            (progn
+              (my/split-switch-right)
+              (my/terminal
+               (select-window term-win)))))))
 
 (defun my/dashboard ()
   "Switch to a custom dashboard buffer"
@@ -309,7 +309,7 @@
 (my/bind-keys*
  ;; menus
  "C-x C-f" #'find-file
- "C-x C-k" #'kill-this-buffer
+ "C-x C-k" (lambda () (interactive) (kill-buffer (current-buffer)))
  "C-x C-s" #'consult-buffer
  "C-x C-u" #'undo-tree-visualize
 
