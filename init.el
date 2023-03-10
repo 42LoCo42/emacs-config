@@ -53,16 +53,18 @@
   "Create or switch to the terminal buffer"
   (interactive)
   (let ((term-win (get-buffer-window "*eat*")))
-    (if (eq term-win nil
-            (progn
-              (my/split-switch-right)
-              (my/terminal
-               (select-window term-win)))))))
+    (if
+      (eq term-win nil)
+      (progn
+        (my/split-switch-right)
+        (my/terminal))
+      (select-window term-win))))
 
 (defun my/dashboard ()
   "Switch to a custom dashboard buffer"
   (interactive)
   (switch-to-buffer (get-buffer-create "*my-dashboard*"))
+  (centaur-tabs-local-mode 1)
   (setq-local mode-line-format nil
               cursor-type nil)
   (erase-buffer)
@@ -85,7 +87,8 @@
 (scroll-bar-mode   0)
 (tool-bar-mode     0)
 (global-prettify-symbols-mode 1)
-(set-frame-font "IosevkaNerdFontMono")
+(setq my/default-font "IosevkaNerdFontMono")
+(set-frame-font my/default-font)
 (setq use-dialog-box nil
       server-client-instructions nil
       inhibit-startup-screen t)
@@ -113,6 +116,24 @@
 
 ;; modeline
 (use-package telephone-line :config (telephone-line-mode 1))
+
+;; tabs
+(use-package all-the-icons)
+(use-package centaur-tabs
+  :custom
+  (centaur-tabs-cycle-scope 'tabs)
+  (centaur-tabs-modified-marker "●")
+  (centaur-tabs-set-bar 'under)
+  (centaur-tabs-set-close-button nil)
+  (centaur-tabs-set-icons t)
+  (centaur-tabs-set-modified-marker t)
+  (centaur-tabs-style "bar")
+  (x-underline-at-descent-line 1)
+  :config
+  (centaur-tabs-mode 1)
+  (centaur-tabs-change-fonts my/default-font 100)
+  (centaur-tabs-headline-match))
+
 
 ;; completion UI
 (use-package vertico
@@ -314,10 +335,12 @@
  "C-x C-u" #'undo-tree-visualize
 
  ;; window control
- "C-x C-0" #'delete-window
- "C-x C-1" #'delete-other-windows
- "C-x C-2" #'my/split-switch-below
- "C-x C-3" #'my/split-switch-right
+ "C-<next>"  #'centaur-tabs-forward
+ "C-<prior>" #'centaur-tabs-backward
+ "C-x C-0"   #'delete-window
+ "C-x C-1"   #'delete-other-windows
+ "C-x C-2"   #'my/split-switch-below
+ "C-x C-3"   #'my/split-switch-right
 
  ;; movement
  "C-#"   #'next-window-any-frame
