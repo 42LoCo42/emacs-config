@@ -37,6 +37,13 @@
   (balance-windows)
   (other-window 1))
 
+(defun my/smart-home ()
+  "Jump to beginning of line or first non-whitespace."
+  (interactive)
+  (let ((oldpos (point)))
+    (back-to-indentation)
+    (and (= oldpos (point)) (beginning-of-line))))
+
 (defun my/terminal ()
   "Open the terminal"
   (interactive)
@@ -315,6 +322,7 @@
  ;; movement
  "C-#"   #'next-window-any-frame
  "C-M-#" #'previous-window-any-frame
+ "C-a"   #'my/smart-home
  "M-c"   #'avy-goto-word-1
  "M-l"   #'consult-goto-line
  "M-n"   #'scroll-up-command
