@@ -45,7 +45,7 @@
 ;; dashboard
 (use-package dashboard
   :custom
-  (dashboard-banner-logo-title "Welcome back, Eleonora!")
+  (dashboard-banner-logo-title (concat "Welcome back, " user-full-name "!"))
   (dashboard-startup-banner (expand-file-name "splash.png" user-emacs-directory))
   (dashboard-set-footer nil)
   (dashboard-items nil)

@@ -21,6 +21,7 @@
  ("ht.el" . "3c1677f1bf2ded2ab07edffb7d17def5d2b5b6f6")
  ("hydra" . "317e1de33086637579a7aeb60f77ed0405bf359b")
  ("inheritenv" . "2102ed2d105a5c9f366cb6503d04794600985598")
+ ("lisp-extra-font-lock" . "4605eccbe1a7fcbd3cacf5b71249435413b4db4f")
  ("lsp-haskell" . "3249cde75fb411f95fe173c222b848182fd0b752")
  ("lsp-mode" . "b489dae1f2f83a1e7b0410622d2b04354448d6c4")
  ("lsp-ui" . "295d8984da06a745b0a36c56e28ce915bc389adb")
