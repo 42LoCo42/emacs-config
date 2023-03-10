@@ -27,7 +27,7 @@
  ("lsp-ui" . "295d8984da06a745b0a36c56e28ce915bc389adb")
  ("marginalia" . "ec2e99f8a12a818ddac2f7db8438477725a1a067")
  ("markdown-mode" . "ece1dd845904b08ab78598dc7e1a2eaf7875d1c4")
- ("melpa" . "9eaf67fb6cdbf24273fa167a9c5e035b9e6efda1")
+ ("melpa" . "dc2ead17a8e5d5df59fc3729c8f0435cfcbf55ef")
  ("multiple-cursors.el" . "6956e8e12ee191d7c80d042ae8ff495286fcbe38")
  ("nongnu-elpa" . "9e236b82a2da24bb9983e2f63061323354d6ecfe")
  ("parinfer-rust-mode" . "332c7f47426f0519dc5c24dda82afdb1aa8b61ee")

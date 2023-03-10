@@ -23,13 +23,15 @@
 
 ;;; APPEARANCE -----------------------------------------------------------------
 
-;; vanilla stuff - menu-bar-mode is in early-init
+;; vanilla stuff
 (blink-cursor-mode 0)
+(menu-bar-mode     0)
 (scroll-bar-mode   0)
 (tool-bar-mode     0)
 (global-prettify-symbols-mode 1)
 (set-frame-font "IosevkaNerdFontMono")
-(setq use-dialog-box nil)
+(setq use-dialog-box nil
+      server-client-instructions nil)
 (defalias 'yes-or-no-p 'y-or-n-p)
 
 ;; line numbers
@@ -47,25 +49,25 @@
   :custom
   (dashboard-banner-logo-title (concat "Welcome back, " user-full-name "!"))
   (dashboard-startup-banner (expand-file-name "splash.png" user-emacs-directory))
-  (dashboard-set-footer nil)
-  (dashboard-items nil)
   :config
   (set-face-attribute 'dashboard-banner-logo-title nil :height 200)
-  (dashboard-setup-startup-hook)
-  (add-hook
-   'after-init-hook
-   (lambda ()
-     (dashboard--with-buffer
-       (setq-local cursor-type nil)
-       (beginning-of-buffer)
-       (newline
-        (/
-         (-
-          (window-height)
-          (count-lines (point-min) (point-max))
-          5)
-         2))))
-   100))
+  (defun my/dashboard ()
+    "Switch to a custom dashboard buffer"
+    (interactive)
+    (switch-to-buffer (get-buffer-create "*my-dashboard*"))
+    (setq-local mode-line-format nil
+                cursor-type nil)
+    (erase-buffer)
+    (dashboard-insert-banner)
+    (beginning-of-buffer)
+    (newline
+     (/
+      (-
+       (window-height)
+       (count-lines (point-min) (point-max))
+       5)
+      2))
+    (message nil)))
 
 ;; modeline
 (use-package telephone-line :config (telephone-line-mode 1))
@@ -297,10 +299,3 @@
  "C-h C-f" #'describe-function
  "C-h C-k" #'describe-key
  "C-h C-v" #'describe-variable)
-
-;;; FINAL CLEANUP --------------------------------------------------------------
-
-(add-hook
- 'dashboard-after-initialize-hook
- (lambda () (message nil)))
-(setq inhibit-redisplay nil)
