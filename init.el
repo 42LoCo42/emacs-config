@@ -21,6 +21,55 @@
 (use-package straight
   :custom (straight-use-package-by-default t))
 
+;;; CUSTOM DEFINITIONS ---------------------------------------------------------
+
+(defun my/split-switch-below ()
+  "Split and switch to window below"
+  (interactive)
+  (split-window-below)
+  (balance-windows)
+  (other-window 1))
+
+(defun my/split-switch-right ()
+  "Split and switch to window on the right"
+  (interactive)
+  (split-window-right)
+  (balance-windows)
+  (other-window 1))
+
+(defun my/terminal ()
+  "Open the terminal"
+  (interactive)
+  (eat "bash"))
+
+(defun my/switch-to-terminal ()
+  "Create or switch to the terminal buffer"
+  (interactive)
+  (let ((term-win (get-buffer-window "*eat*")))
+    (if (eq term-win nil)
+     (progn
+       (my/split-switch-right)
+       (my/terminal))
+     (select-window term-win))))
+
+(defun my/dashboard ()
+  "Switch to a custom dashboard buffer"
+  (interactive)
+  (switch-to-buffer (get-buffer-create "*my-dashboard*"))
+  (setq-local mode-line-format nil
+              cursor-type nil)
+  (erase-buffer)
+  (dashboard-insert-banner)
+  (beginning-of-buffer)
+  (newline
+   (/
+    (-
+     (window-height)
+     (count-lines (point-min) (point-max))
+     5)
+    2))
+  (message nil))
+
 ;;; APPEARANCE -----------------------------------------------------------------
 
 ;; vanilla stuff
@@ -52,24 +101,7 @@
   (dashboard-banner-logo-title (concat "Welcome back, " user-full-name "!"))
   (dashboard-startup-banner (expand-file-name "splash.png" user-emacs-directory))
   :config
-  (set-face-attribute 'dashboard-banner-logo-title nil :height 200)
-  (defun my/dashboard ()
-    "Switch to a custom dashboard buffer"
-    (interactive)
-    (switch-to-buffer (get-buffer-create "*my-dashboard*"))
-    (setq-local mode-line-format nil
-                cursor-type nil)
-    (erase-buffer)
-    (dashboard-insert-banner)
-    (beginning-of-buffer)
-    (newline
-     (/
-      (-
-       (window-height)
-       (count-lines (point-min) (point-max))
-       5)
-      2))
-    (message nil)))
+  (set-face-attribute 'dashboard-banner-logo-title nil :height 200))
 (add-hook 'after-init-hook #'my/dashboard)
 
 ;; modeline
@@ -189,6 +221,10 @@
   :custom (undo-tree-history-directory-alist `(("." . ,my/temp-dir)))
   :config (global-undo-tree-mode 1))
 
+;;; TERMINAL -------------------------------------------------------------------
+
+(use-package eat)
+
 ;;; PROGRAMMING BASICS ---------------------------------------------------------
 
 (use-package project)
@@ -265,25 +301,15 @@
 (my/bind-keys*
  ;; menus
  "C-x C-f" #'find-file
- "C-x C-k" #'kill-buffer
+ "C-x C-k" #'kill-this-buffer
  "C-x C-s" #'consult-buffer
  "C-x C-u" #'undo-tree-visualize
 
  ;; window control
  "C-x C-0" #'delete-window
  "C-x C-1" #'delete-other-windows
- "C-x C-2"
- (lambda ()
-   (interactive)
-   (split-window-below)
-   (balance-windows)
-   (other-window 1))
- "C-x C-3"
- (lambda ()
-   (interactive)
-   (split-window-right)
-   (balance-windows)
-   (other-window 1))
+ "C-x C-2" #'my/split-switch-below
+ "C-x C-3" #'my/split-switch-right
 
  ;; movement
  "C-#"   #'next-window-any-frame
