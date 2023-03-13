@@ -294,6 +294,7 @@
   :custom
   (parinfer-rust-library-directory my/temp-dir)
   (parinfer-rust-auto-download t))
+(add-hook 'emacs-lisp-mode-hook #'(lambda () (electric-indent-mode 0)))
 
 ;; haskell
 (use-package haskell-mode
