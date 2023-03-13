@@ -367,6 +367,7 @@ BODY: a list of alternating key-function arguments."
  "C-x C-1"   #'delete-other-windows
  "C-x C-2"   #'my/split-switch-below
  "C-x C-3"   #'my/split-switch-right
+ "C-x C-4"   #'kill-buffer-and-window
 
  ;; movement
  "C-#"   #'next-window-any-frame
@@ -394,7 +395,11 @@ BODY: a list of alternating key-function arguments."
  ;; text scale
  "C-+" #'text-scale-increase
  "C--" #'text-scale-decrease
- "C-=" (lambda () (interactive) (text-scale-mode 0))
+ "C-=" #'text-scale-mode
+
+ ;; utils
+ "C-x C-a" #'mark-whole-buffer
+ "C-x C-r" (lambda () (interactive) (load-file user-init-file))
 
  ;; help
  "C-h C-b" #'describe-personal-keybindings
