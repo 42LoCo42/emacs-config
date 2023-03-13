@@ -1,4 +1,6 @@
-;; vim: expandtab shiftwidth=2
+;;; init.el --- Emacs initialization file
+;;; Commentary:
+;;; Code:
 
 ;;; PACKAGE MANAGEMENT ---------------------------------------------------------
 
@@ -24,14 +26,14 @@
 ;;; CUSTOM DEFINITIONS ---------------------------------------------------------
 
 (defun my/split-switch-below ()
-  "Split and switch to window below"
+  "Split and switch to window below."
   (interactive)
   (split-window-below)
   (balance-windows)
   (other-window 1))
 
 (defun my/split-switch-right ()
-  "Split and switch to window on the right"
+  "Split and switch to window on the right."
   (interactive)
   (split-window-right)
   (balance-windows)
@@ -45,12 +47,12 @@
     (and (= oldpos (point)) (beginning-of-line))))
 
 (defun my/terminal ()
-  "Open the terminal"
+  "Open the terminal."
   (interactive)
   (eat "bash"))
 
 (defun my/switch-to-terminal ()
-  "Create or switch to the terminal buffer"
+  "Create or switch to the terminal buffer."
   (interactive)
   (let ((term-win (get-buffer-window "*eat*")))
     (if
@@ -61,7 +63,7 @@
       (select-window term-win))))
 
 (defun my/dashboard ()
-  "Switch to a custom dashboard buffer"
+  "Switch to a custom dashboard buffer."
   (interactive)
   (switch-to-buffer (get-buffer-create "*my-dashboard*"))
   (centaur-tabs-local-mode 1)
@@ -69,7 +71,7 @@
               cursor-type nil)
   (erase-buffer)
   (dashboard-insert-banner)
-  (beginning-of-buffer)
+  (call-interactively #'beginning-of-buffer)
   (newline
    (/
     (-
@@ -80,7 +82,7 @@
   (message nil))
 
 (defun my/eat-reset ()
-  "Reset eat and input newline"
+  "Reset eat and input newline."
   (interactive)
   (eat-reset)
   (eat-self-input 1 ?\n))
@@ -93,19 +95,26 @@
 (scroll-bar-mode   0)
 (tool-bar-mode     0)
 (global-prettify-symbols-mode 1)
-(setq my/default-font "IosevkaNerdFontMono")
+
+(defvar my/default-font "IosevkaNerdFontMono")
 (set-frame-font my/default-font)
+(setq-default tab-width 4)
 (setq use-dialog-box nil
-      server-client-instructions nil
       inhibit-startup-screen t
       initial-scratch-message "")
-(setq-default tab-width 4)
+
+;; yes or no in a single keystroke
 (defalias 'yes-or-no-p 'y-or-n-p)
 
+;; no "when done with this frame" message in emacsclient
+(use-package server :custom (server-client-instructions nil))
+
 ;; line numbers
-(global-display-line-numbers-mode 1)
-(setq display-line-numbers-type 'relative)
-(set-face-background 'line-number nil)
+(use-package display-line-numbers
+  :custom (display-line-numbers-type 'relative)
+  :config
+  (set-face-background 'line-number nil)
+  (global-display-line-numbers-mode 1))
 
 ;; theme
 (use-package gruvbox-theme
@@ -140,7 +149,6 @@
   (centaur-tabs-mode 1)
   (centaur-tabs-change-fonts my/default-font 100)
   (centaur-tabs-headline-match))
-
 
 ;; completion UI
 (use-package vertico
@@ -177,8 +185,8 @@
 
 ;;; TEMPORARY FILES ------------------------------------------------------------
 
-(setq my/temp-dir (concat user-emacs-directory "temp/")
-      backup-directory-alist         `(("." . ,my/temp-dir))
+(defvar my/temp-dir (concat user-emacs-directory "temp/"))
+(setq backup-directory-alist         `(("." . ,my/temp-dir))
       auto-save-file-name-transforms `((".*"  ,my/temp-dir t))
       auto-save-list-file-prefix               my/temp-dir)
 
@@ -294,6 +302,9 @@
   :config
   (push '("Haskell" stylish-haskell) format-all-default-formatters))
 
+;; error checking
+(use-package flycheck :config (global-flycheck-mode 1))
+
 ;;; LANGUAGES ------------------------------------------------------------------
 
 ;; lisp
@@ -331,7 +342,7 @@
 
 (defmacro my/bind-keys* (&rest body)
   "Globally bind all keys.
-  BODY: a list of alternating key-function arguments."
+BODY: a list of alternating key-function arguments."
   `(progn
      ,@(cl-loop
         while body collecting
@@ -381,3 +392,9 @@
  "startup-notify" nil
  "notify-send" "emacs"
  (format "Startup took %s!" (emacs-init-time)))
+
+(provide 'init)
+;; Local Variables:
+;; byte-compile-warnings: (not unresolved free-vars)
+;; End:
+;;; init.el ends here
