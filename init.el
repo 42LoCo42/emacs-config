@@ -202,7 +202,9 @@
   :custom
   (which-key-idle-delay 0.5)
   (which-key-idle-secondary-delay 0)
-  :config (which-key-mode 1))
+  :config
+  (which-key-mode 1)
+  (which-key-setup-side-window-bottom))
 
 ;; frecency-based sorting
 (use-package prescient
@@ -292,8 +294,7 @@
   :custom
   (lsp-ui-sideline-show-code-actions t)
   (lsp-ui-sideline-show-diagnostics t)
-  (lsp-ui-sideline-show-hover t)
-  (lsp-ui-sideline-show-symbol t))
+  (lsp-ui-sideline-show-hover nil))
 
 ;; formatting
 (use-package format-all
@@ -330,6 +331,9 @@
 ;; golang
 (use-package go-mode
   :bind (:map go-mode-map ("C-x C-p" . #'my/switch-to-terminal)))
+
+;; rust
+(use-package rustic)
 
 ;;; KEYBINDINGS ----------------------------------------------------------------
 
@@ -381,6 +385,16 @@ BODY: a list of alternating key-function arguments."
  "C-s"     #'save-buffer
  "C-y"     #'undo-tree-redo
  "C-z"     #'undo-tree-undo
+
+ ;; LSP stuff
+ "C-c C-f C-d" #'lsp-ui-peek-find-definitions
+ "C-c C-f C-i" #'lsp-ui-peek-find-implementation
+ "C-c C-f C-r" #'lsp-ui-peek-find-references
+
+ ;; text scale
+ "C-+" #'text-scale-increase
+ "C--" #'text-scale-decrease
+ "C-=" (lambda () (interactive) (text-scale-mode 0))
 
  ;; help
  "C-h C-b" #'describe-personal-keybindings
