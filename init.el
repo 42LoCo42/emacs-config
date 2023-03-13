@@ -54,10 +54,10 @@
   (interactive)
   (let ((term-win (get-buffer-window "*eat*")))
     (if
-      (eq term-win nil)
-      (progn
-        (my/split-switch-right)
-        (my/terminal))
+        (eq term-win nil)
+        (progn
+          (my/split-switch-right)
+          (my/terminal))
       (select-window term-win))))
 
 (defun my/dashboard ()
@@ -79,6 +79,12 @@
     2))
   (message nil))
 
+(defun my/eat-reset ()
+  "Reset eat and input newline"
+  (interactive)
+  (eat-reset)
+  (eat-self-input 1 ?\n))
+
 ;;; APPEARANCE -----------------------------------------------------------------
 
 ;; vanilla stuff
@@ -91,7 +97,8 @@
 (set-frame-font my/default-font)
 (setq use-dialog-box nil
       server-client-instructions nil
-      inhibit-startup-screen t)
+      inhibit-startup-screen t
+      initial-scratch-message "")
 (setq-default tab-width 4)
 (defalias 'yes-or-no-p 'y-or-n-p)
 
@@ -219,6 +226,7 @@
   (git-gutter:added-sign    "+")
   (git-gutter:modified-sign "~")
   (git-gutter:deleted-sign  "-")
+  (git-gutter:update-timer 2)
   :config
   (set-face-background 'git-gutter:added    nil)
   (set-face-background 'git-gutter:modified nil)
@@ -248,7 +256,8 @@
 
 ;;; TERMINAL -------------------------------------------------------------------
 
-(use-package eat)
+(use-package eat
+  :bind (:map eat-semi-char-mode-map ("C-l" . #'my/eat-reset)))
 
 ;;; PROGRAMMING BASICS ---------------------------------------------------------
 
@@ -333,6 +342,7 @@
  "C-x C-f" #'find-file
  "C-x C-k" (lambda () (interactive) (kill-buffer (current-buffer)))
  "C-x C-s" #'consult-buffer
+ "C-x C-t" #'my/switch-to-terminal
  "C-x C-u" #'undo-tree-visualize
 
  ;; window control
@@ -366,3 +376,8 @@
  "C-h C-f" #'describe-function
  "C-h C-k" #'describe-key
  "C-h C-v" #'describe-variable)
+
+(start-process
+ "startup-notify" nil
+ "notify-send" "emacs"
+ (format "Startup took %s!" (emacs-init-time)))
