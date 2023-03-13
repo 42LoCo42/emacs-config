@@ -131,7 +131,14 @@
 (add-hook 'after-init-hook #'my/dashboard)
 
 ;; modeline
-(use-package telephone-line :config (telephone-line-mode 1))
+(use-package telephone-line
+  :custom
+  (telephone-line-lhs
+   '((accent . (telephone-line-vc-segment
+                telephone-line-process-segment))
+     (nil    . (telephone-line-project-segment
+                telephone-line-buffer-segment)))))
+:config (telephone-line-mode 1)
 
 ;; tabs
 (use-package all-the-icons)
