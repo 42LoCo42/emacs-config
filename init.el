@@ -380,6 +380,7 @@ BODY: a list of alternating key-function arguments."
 (my/bind-keys*
  ;; menus
  "C-x C-f" #'find-file
+ "C-x C-g" #'consult-ripgrep
  "C-x C-k" (lambda () (interactive) (kill-buffer (current-buffer)))
  "C-x C-s" #'consult-buffer
  "C-x C-t" #'my/switch-to-terminal
@@ -413,9 +414,12 @@ BODY: a list of alternating key-function arguments."
  "C-z"     #'undo-tree-undo
 
  ;; LSP stuff
+ "C-c C-a"     #'lsp-execute-code-action
  "C-c C-f C-d" #'lsp-ui-peek-find-definitions
  "C-c C-f C-i" #'lsp-ui-peek-find-implementation
  "C-c C-f C-r" #'lsp-ui-peek-find-references
+ "C-c C-o"     #'lsp-organize-imports
+ "C-c C-r"     #'lsp-rename
 
  ;; text scale
  "C-+" #'text-scale-increase
