@@ -183,6 +183,13 @@
   :config (global-whitespace-mode 1)
   :custom (whitespace-style '(face tab-mark trailing missig-newline-at-eof)))
 
+;; show color strings
+(use-package rainbow-mode
+  :config
+  (define-globalized-minor-mode my/global-rainbow-mode rainbow-mode
+    (lambda () (rainbow-mode 1)))
+  (my/global-rainbow-mode))
+
 ;;; POPUP CONTROL --------------------------------------------------------------
 
 (use-package popwin
@@ -444,6 +451,6 @@ BODY: a list of alternating key-function arguments."
 
 (provide 'init)
 ;; Local Variables:
-;; byte-compile-warnings: (not unresolved free-vars)
+;; byte-compile-warnings: (not free-vars)
 ;; End:
 ;;; init.el ends here
