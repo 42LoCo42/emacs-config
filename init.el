@@ -66,6 +66,7 @@
   "Switch to a custom dashboard buffer."
   (interactive)
   (switch-to-buffer (get-buffer-create "*my-dashboard*"))
+  (read-only-mode 0)
   (centaur-tabs-local-mode 1)
   (setq-local mode-line-format nil
               cursor-type nil)
@@ -79,6 +80,8 @@
      (count-lines (point-min) (point-max))
      5)
     2))
+  (cd "~")
+  (read-only-mode 1)
   (message nil))
 
 (defun my/eat-reset ()
@@ -230,12 +233,12 @@
   :hook prog-mode
   :custom (rainbow-delimiters-max-face-count 6)
   :config
-  (set-face-foreground 'rainbow-delimiters-depth-1-face "#e50000")
-  (set-face-foreground 'rainbow-delimiters-depth-2-face "#ff8d00")
-  (set-face-foreground 'rainbow-delimiters-depth-3-face "#ffee00")
-  (set-face-foreground 'rainbow-delimiters-depth-4-face "#008121")
-  (set-face-foreground 'rainbow-delimiters-depth-5-face "#004cff")
-  (set-face-foreground 'rainbow-delimiters-depth-6-face "#760188"))
+  (set-face-foreground 'rainbow-delimiters-depth-1-face "#cc241d")
+  (set-face-foreground 'rainbow-delimiters-depth-2-face "#98971a")
+  (set-face-foreground 'rainbow-delimiters-depth-3-face "#d79921")
+  (set-face-foreground 'rainbow-delimiters-depth-4-face "#458588")
+  (set-face-foreground 'rainbow-delimiters-depth-5-face "#b16286")
+  (set-face-foreground 'rainbow-delimiters-depth-6-face "#689d6a"))
 
 ;; git gutter
 (use-package git-gutter
