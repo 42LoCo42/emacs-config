@@ -255,8 +255,6 @@
 
 ;;; EDITING --------------------------------------------------------------------
 
-(cua-mode 1)
-
 (use-package multiple-cursors)
 
 ;; jump to things
@@ -435,6 +433,9 @@ BODY: a list of alternating key-function arguments."
  "C-h C-f" #'describe-function
  "C-h C-k" #'describe-key
  "C-h C-v" #'describe-variable)
+
+;; cua overrides C-c from keybinds
+(cua-mode 1)
 
 (start-process
  "startup-notify" nil
