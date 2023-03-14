@@ -316,6 +316,16 @@
 ;; error checking
 (use-package flycheck :config (global-flycheck-mode 1))
 
+;; snippets
+(use-package yasnippet :config (yas-global-mode 1))
+
+;; TODO highlighting
+(use-package hl-todo :config (global-hl-todo-mode 1))
+
+;; electricity
+(electric-indent-mode 1)
+(electric-pair-mode 1)
+
 ;;; LANGUAGES ------------------------------------------------------------------
 
 ;; lisp
@@ -325,7 +335,12 @@
   :custom
   (parinfer-rust-library-directory my/temp-dir)
   (parinfer-rust-auto-download t))
-(add-hook 'emacs-lisp-mode-hook #'(lambda () (electric-indent-mode 0)))
+
+(add-hook
+ 'emacs-lisp-mode-hook
+ #'(lambda ()
+     (electric-indent-local-mode 0)
+     (electric-pair-local-mode 0)))
 
 ;; haskell
 (use-package haskell-mode
