@@ -144,7 +144,10 @@
 :config (telephone-line-mode 1)
 
 ;; tabs
-(use-package all-the-icons)
+(use-package all-the-icons
+  :custom
+  (all-the-icons-fonts-subdirectory "all-the-icons"))
+
 (use-package centaur-tabs
   :custom
   (centaur-tabs-cycle-scope 'tabs)
@@ -353,8 +356,14 @@
   :hook
   (haskell-interactive-mode
    . (lambda ()
+       (bind-key "C-l" #'haskell-interactive-mode-clear            'haskell-interactive-mode-map)
+       (bind-key "C-n" #'haskell-interactive-mode-history-next     'haskell-interactive-mode-map)
        (bind-key "C-p" #'haskell-interactive-mode-history-previous 'haskell-interactive-mode-map)
-       (bind-key "C-n" #'haskell-interactive-mode-history-next     'haskell-interactive-mode-map))))
+       (bind-key "C-r"
+         (lambda ()
+           (interactive)
+           (haskell-process-file-loadish "reload" t (current-buffer)))
+         'haskell-interactive-mode-map))))
 
 (use-package lsp-haskell)
 
@@ -443,6 +452,7 @@ BODY: a list of alternating key-function arguments."
 
 ;; cua overrides C-c from keybinds
 (cua-mode 1)
+(bind-key "M-v" #'consult-yank-from-kill-ring 'cua--cua-keys-keymap)
 
 (start-process
  "startup-notify" nil
