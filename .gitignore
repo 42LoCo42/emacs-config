@@ -5,3 +5,4 @@
 /straight/*
 !/straight/versions
 /temp
+/daemon/supervise
