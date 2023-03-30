@@ -98,6 +98,7 @@
 (scroll-bar-mode   0)
 (tool-bar-mode     0)
 (global-prettify-symbols-mode 1)
+(global-hl-line-mode          1)
 
 (defvar my/default-font "IosevkaNerdFontMono")
 (set-frame-font my/default-font)
@@ -127,7 +128,7 @@
 ;; dashboard
 (use-package dashboard
   :custom
-  (dashboard-banner-logo-title (concat "Welcome back, " user-full-name "!"))
+  (dashboard-banner-logo-title "Welcome to Emacs!")
   (dashboard-startup-banner (expand-file-name "splash.png" user-emacs-directory))
   :config
   (set-face-attribute 'dashboard-banner-logo-title nil :height 200))
@@ -153,6 +154,7 @@
   (centaur-tabs-cycle-scope 'tabs)
   (centaur-tabs-modified-marker "●")
   (centaur-tabs-set-bar 'under)
+  (centaur-tabs-show-new-tab-button nil)
   (centaur-tabs-set-close-button nil)
   (centaur-tabs-set-icons t)
   (centaur-tabs-set-modified-marker t)
@@ -289,6 +291,9 @@
 
 ;;; PROGRAMMING BASICS ---------------------------------------------------------
 
+;; clean up trailing whitespace
+(add-hook 'before-save-hook #'delete-trailing-whitespace)
+
 (use-package project)
 
 ;; autocompletion
@@ -347,6 +352,7 @@
 (add-hook
  'emacs-lisp-mode-hook
  #'(lambda ()
+     (format-all-mode 0)
      (electric-indent-local-mode 0)
      (electric-pair-local-mode 0)))
 
@@ -373,6 +379,9 @@
 
 ;; rust
 (use-package rustic)
+
+;; org
+(add-hook 'org-mode-hook #'org-indent-mode)
 
 ;;; KEYBINDINGS ----------------------------------------------------------------
 
@@ -413,7 +422,7 @@ BODY: a list of alternating key-function arguments."
  "C-#"   #'next-window-any-frame
  "C-M-#" #'previous-window-any-frame
  "C-a"   #'my/smart-home
- "M-c"   #'avy-goto-word-1
+ "M-c"   #'avy-goto-char-timer
  "M-l"   #'consult-goto-line
  "M-n"   #'scroll-up-command
  "M-p"   #'scroll-down-command
