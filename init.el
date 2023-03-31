@@ -105,7 +105,8 @@
 (setq-default tab-width 4)
 (setq use-dialog-box nil
       inhibit-startup-screen t
-      initial-scratch-message "")
+      initial-scratch-message ""
+      Man-notify-method 'aggressive)
 
 ;; yes or no in a single keystroke
 (defalias 'yes-or-no-p 'y-or-n-p)
@@ -402,11 +403,12 @@ BODY: a list of alternating key-function arguments."
 
 (my/bind-keys*
  ;; menus
+ "C-x C-b" #'consult-bookmark
  "C-x C-f" #'find-file
  "C-x C-g" #'consult-ripgrep
- "C-x C-k" (lambda () (interactive) (kill-buffer (current-buffer)))
+ "C-x C-m" #'consult-minor-mode-menu
+ "C-x C-o" #'consult-outline
  "C-x C-s" #'consult-buffer
- "C-x C-t" #'my/switch-to-terminal
  "C-x C-u" #'undo-tree-visualize
 
  ;; window control
@@ -451,12 +453,15 @@ BODY: a list of alternating key-function arguments."
 
  ;; utils
  "C-x C-a" #'mark-whole-buffer
+ "C-x C-k" (lambda () (interactive) (kill-buffer (current-buffer)))
  "C-x C-r" (lambda () (interactive) (load-file user-init-file))
+ "C-x C-t" #'my/switch-to-terminal
 
  ;; help
  "C-h C-b" #'describe-personal-keybindings
  "C-h C-f" #'describe-function
  "C-h C-k" #'describe-key
+ "C-h C-m" #'consult-man
  "C-h C-v" #'describe-variable)
 
 ;; cua overrides C-c from keybinds
