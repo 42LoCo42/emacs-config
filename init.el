@@ -362,7 +362,7 @@
        (bind-key "C-r"
          (lambda ()
            (interactive)
-           (haskell-process-file-loadish "reload" t (current-buffer)))
+           (haskell-process-file-loadish "reload" t haskell-interactive-previous-buffer))
          'haskell-interactive-mode-map))))
 
 (use-package lsp-haskell)
@@ -373,6 +373,10 @@
 
 ;; rust
 (use-package rustic)
+
+;; HTML
+(use-package sgml-mode
+ :custom (sgml-basic-offset 4))
 
 ;;; KEYBINDINGS ----------------------------------------------------------------
 
