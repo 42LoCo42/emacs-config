@@ -6,3 +6,6 @@
 !/straight/versions
 /temp
 /daemon/supervise
+/.mc-lists.el
+/eln-cache
+/url
