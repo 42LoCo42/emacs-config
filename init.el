@@ -103,10 +103,11 @@
 (defvar my/default-font "IosevkaNerdFontMono")
 (set-frame-font my/default-font)
 (setq-default tab-width 4)
-(setq use-dialog-box nil
+(setq Man-notify-method 'aggressive
       inhibit-startup-screen t
       initial-scratch-message ""
-      Man-notify-method 'aggressive)
+      ring-bell-function 'ignore
+      use-dialog-box nil)
 
 ;; yes or no in a single keystroke
 (defalias 'yes-or-no-p 'y-or-n-p)
