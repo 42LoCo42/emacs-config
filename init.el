@@ -312,7 +312,8 @@
   :custom (lsp-headerline-breadcrumb-enable nil)
   :hook
   (go-mode      . lsp-deferred)
-  (haskell-mode . lsp-deferred))
+  (haskell-mode . lsp-deferred)
+  (nix-mode     . lsp-deferred))
 
 (use-package lsp-ui
   :custom
@@ -369,7 +370,7 @@
        (bind-key "C-r"
          (lambda ()
            (interactive)
-           (haskell-process-file-loadish "reload" t (current-buffer)))
+           (haskell-process-file-loadish "reload" t haskell-interactive-previous-buffer))
          'haskell-interactive-mode-map))))
 
 (use-package lsp-haskell)
@@ -383,6 +384,9 @@
 
 ;; org
 (add-hook 'org-mode-hook #'org-indent-mode)
+
+;; nix
+(use-package nix-mode)
 
 ;;; KEYBINDINGS ----------------------------------------------------------------
 
