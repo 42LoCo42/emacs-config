@@ -382,6 +382,10 @@
 ;; rust
 (use-package rustic)
 
+;; HTML
+(use-package sgml-mode
+ :custom (sgml-basic-offset 4))
+
 ;; org
 (add-hook 'org-mode-hook #'org-indent-mode)
 
