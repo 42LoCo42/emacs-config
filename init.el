@@ -93,12 +93,13 @@
 ;;; APPEARANCE -----------------------------------------------------------------
 
 ;; vanilla stuff
-(blink-cursor-mode 0)
-(menu-bar-mode     0)
-(scroll-bar-mode   0)
-(tool-bar-mode     0)
-(global-prettify-symbols-mode 1)
+(blink-cursor-mode            0)
+(menu-bar-mode                0)
+(scroll-bar-mode              0)
+(tool-bar-mode                0)
+(global-auto-revert-mode      1)
 (global-hl-line-mode          1)
+(global-prettify-symbols-mode 1)
 
 (defvar my/default-font "IosevkaNerdFontMono")
 (set-frame-font my/default-font)
@@ -289,6 +290,7 @@
 ;;; TERMINAL -------------------------------------------------------------------
 
 (use-package eat
+  :custom (eat-term-inside-emacs "vterm")
   :bind (:map eat-semi-char-mode-map ("C-l" . #'my/eat-reset)))
 
 ;;; PROGRAMMING BASICS ---------------------------------------------------------
@@ -342,6 +344,9 @@
 (electric-indent-mode 1)
 (electric-pair-mode 1)
 
+;; direnv integration - automatically loads environments
+(use-package direnv :config (direnv-mode 1))
+
 ;;; LANGUAGES ------------------------------------------------------------------
 
 ;; lisp
@@ -392,6 +397,13 @@
 
 ;; nix
 (use-package nix-mode)
+
+;; GraphQL
+(use-package graphql-mode)
+
+;; structured data
+(use-package json-mode)
+(use-package yaml-mode)
 
 ;;; KEYBINDINGS ----------------------------------------------------------------
 
