@@ -442,8 +442,8 @@ BODY: a list of alternating key-function arguments."
  "C-x C-4"   #'kill-buffer-and-window
 
  ;; movement
- "C-#"   #'next-window-any-frame
- "C-M-#" #'previous-window-any-frame
+ "C-#"   (lambda () (interactive) (select-window (next-window)))
+ "C-M-#" (lambda () (interactive) (select-window (previous-window)))
  "C-a"   #'my/smart-home
  "M-c"   #'avy-goto-char-timer
  "M-l"   #'consult-goto-line
