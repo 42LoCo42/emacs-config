@@ -1,5 +1,6 @@
 #+HTML_HEAD:  <link rel="stylesheet" type="text/css" href="https://eleonora.gay/emacs/style.css" />
 #+TITLE: My Emacs configuration
+#+SUBTITLE: [[https://github.com/42LoCo42/emacs-config]]
 
 * Package management
 ** Load straight
