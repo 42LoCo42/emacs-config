@@ -1,13 +1,15 @@
 /straight/*
 !/straight/versions
 
+/.cache
 /.lsp-session-v1
 /.mc-lists.el
 /daemon/supervise
 /eln-cache
 /games
+/init.el
+/init.html
 /projects
 /recentf
 /temp
 /url
-/.cache

@@ -9,3 +9,4 @@
    (message "gc-cons-threshold restored to %s" gc-cons-threshold)))
 
 (setq package-enable-at-startup nil)
+(org-babel-load-file (expand-file-name "init.org" user-emacs-directory))

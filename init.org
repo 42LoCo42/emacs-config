@@ -1,0 +1,786 @@
+#+HTML_HEAD:  <link rel="stylesheet" type="text/css" href="https://eleonora.gay/emacs/style.css" />
+#+TITLE: My Emacs configuration
+
+* Package management
+** Load straight
+[[https://github.com/raxod502/straight.el][straight]] is a purely functional package manager for Emacs.
+It enables 100% reproducible package management and makes editing packages very easy!
+
+Initialization code taken directly from
+[[https://github.com/radian-software/straight.el#getting-started]]
+#+begin_src elisp
+  (defvar bootstrap-version)
+  (let ((bootstrap-file
+         (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+        (bootstrap-version 6))
+    (unless (file-exists-p bootstrap-file)
+      (with-current-buffer
+          (url-retrieve-synchronously
+           "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
+           'silent 'inhibit-cookies)
+        (goto-char (point-max))
+        (eval-print-last-sexp)))
+    (load bootstrap-file nil 'nomessage))
+#+end_src
+
+** Load use-package
+[[https://github.com/jwiegley/use-package][use-package]] is a tool to declaratively specify package configuration.
+This increases performance (not everything is loaded at once) and tidiness.
+use-package integrates with straight to fetch packages.
+#+begin_src elisp
+  (straight-use-package 'use-package)
+  (use-package straight
+    :custom (straight-use-package-by-default t))
+#+end_src
+
+* Custom Functions
+** split-window fix
+The default behaviour of the split-window functions is to just split,
+but not to select the new window.
+These functions are a fix for that.
+They also balance the window layout.
+#+begin_src elisp
+  (defun my/split-switch-below ()
+    "Split and switch to window below."
+    (interactive)
+    (split-window-below)
+    (balance-windows)
+    (other-window 1))
+
+  (defun my/split-switch-right ()
+    "Split and switch to window on the right."
+    (interactive)
+    (split-window-right)
+    (balance-windows)
+    (other-window 1))
+#+end_src
+
+** A smarter C-a
+This function allows jumping to the start of the line
+or the first non-whitespace character just by calling it repeatedly.
+#+begin_src elisp
+  (defun my/smart-home ()
+    "Jump to beginning of line or first non-whitespace."
+    (interactive)
+    (let ((oldpos (point)))
+      (back-to-indentation)
+      (and (= oldpos (point)) (beginning-of-line))))
+#+end_src
+
+** Terminal functions
+Some functions for terminal interaction.
+The first one just opens a terminal in the current buffer.
+The second one checks if we are already in the terminal buffer,
+then it does nothing.
+Otherwise, it opens a terminal buffer on the right.
+The third function resets the terminal.
+#+begin_src elisp
+  (defun my/terminal ()
+    "Open the terminal."
+    (interactive)
+    (eat "bash"))
+
+  (defun my/switch-to-terminal ()
+    "Create or switch to the terminal buffer."
+    (interactive)
+    (let ((term-win (get-buffer-window "*eat*")))
+      (if
+          (eq term-win nil)
+          (progn
+            (my/split-switch-right)
+            (my/terminal))
+        (select-window term-win))))
+
+  (defun my/eat-reset ()
+    "Reset eat and input newline."
+    (interactive)
+    (eat-reset)
+    (eat-self-input 1 ?\n))
+#+end_src
+
+** Dashboard
+My dashboard is *very* minimalistic: a logo and some package load statistics.
+The logo should be centered both vertically and horizontally.
+#+begin_src elisp
+  (defun my/dashboard ()
+    "Switch to a custom dashboard buffer."
+    (interactive)
+    (switch-to-buffer (get-buffer-create "*my-dashboard*"))
+    (read-only-mode 0)
+    (centaur-tabs-local-mode 1) ; this *disables* the tab bar
+    (setq-local mode-line-format nil
+                cursor-type nil)
+    (erase-buffer)
+    (dashboard-insert-banner)
+    (call-interactively #'beginning-of-buffer)
+    (newline
+     (/
+      (-
+       (window-height)
+       (count-lines (point-min) (point-max))
+       5)
+      2))
+    (cd "~")
+    (read-only-mode 1)
+    (message nil))
+#+end_src
+
+* General configuration
+** Some modes
+We don't want:
+- a blinking cursor
+- a menu, scroll, and tool bar
+#+begin_src elisp
+  (blink-cursor-mode 0)
+  (menu-bar-mode     0)
+  (scroll-bar-mode   0)
+  (tool-bar-mode     0)
+#+end_src
+
+We want:
+- to automatically reload a buffer when its corresponding file changes
+- the current line to be highlighted
+- pretty symbols
+#+begin_src elisp
+  (global-auto-revert-mode      1)
+  (global-hl-line-mode          1)
+  (global-prettify-symbols-mode 1)
+#+end_src
+
+** More miscellaneous settings
+No startup screen (we have our own dashboard).
+No initial message in the scratch buffer.
+No bell, dialogs or long yes-or-no questions.
+And finally, no "when done with this frame..." message
+in emacsclient frames.
+#+begin_src elisp
+  (setq inhibit-startup-screen t
+        initial-scratch-message ""
+        ring-bell-function 'ignore
+        use-dialog-box nil)
+
+  (defalias 'yes-or-no-p 'y-or-n-p)
+
+  (use-package server :custom (server-client-instructions nil))
+#+end_src
+
+* Appearance
+** Theme
+Gruvbox medium dark is the supreme colorscheme
+and I will fight anyone who dare says otherwise.
+[[https://github.com/greduan/emacs-theme-gruvbox][Link to repo]]
+#+begin_src elisp
+  (use-package gruvbox-theme
+    :custom (custom-safe-themes '("72ed8b6bffe0bfa8d097810649fd57d2b598deef47c992920aef8b5d9599eefe" default))
+    :config (load-theme 'gruvbox-dark-medium))
+#+end_src
+
+** Font
+We use [[https://typeof.net/Iosevka/][Iosevka]] as a basis for [[https://www.nerdfonts.com/][Nerd Fonts]]
+#+begin_src elisp
+  (defvar my/default-font "IosevkaNerdFontMono")
+  (set-frame-font my/default-font)
+#+end_src
+
+** Tab width
+4 spaces by default.
+#+begin_src elisp
+  (setq-default tab-width 4)
+#+end_src
+
+** Line numbers
+We use relative line numbers because they make relative jumps easier
+(no need to type the full line number, two digits are always enough).
+#+begin_src elisp
+  (use-package display-line-numbers
+    :custom (display-line-numbers-type 'relative)
+    :config
+    (set-face-background 'line-number nil)
+    (global-display-line-numbers-mode 1))
+#+end_src
+
+** Tab bar
+[[https://github.com/ema2159/centaur-tabs][centaur-tabs]] creates a nice tab bar at the top of a window.
+It groups buffers by type and project,
+has a "modified" indicator and other goodies.
+#+begin_src elisp
+  (use-package centaur-tabs
+    :custom
+    (centaur-tabs-cycle-scope 'tabs)
+    (centaur-tabs-modified-marker "●")
+    (centaur-tabs-set-bar 'under)
+    (centaur-tabs-show-new-tab-button nil)
+    (centaur-tabs-set-close-button nil)
+    (centaur-tabs-set-icons t)
+    (centaur-tabs-set-modified-marker t)
+    (centaur-tabs-style "bar")
+    (x-underline-at-descent-line 1)
+    :config
+    (centaur-tabs-mode 1)
+    (centaur-tabs-change-fonts my/default-font 100)
+    (centaur-tabs-headline-match))
+#+end_src
+
+** Icons
+[[https://github.com/domtronn/all-the-icons.el][All the icons]] for our tab bar!
+#+begin_src elisp
+  (use-package all-the-icons
+    :custom
+    (all-the-icons-fonts-subdirectory "all-the-icons"))
+#+end_src
+
+** Modeline
+We use [[https://github.com/dbordak/telephone-line][telephone-line]], a pretty simple custom modeline.
+#+begin_src elisp
+  (use-package telephone-line
+    :custom
+    (telephone-line-lhs
+     '((accent . (telephone-line-vc-segment
+                  telephone-line-process-segment))
+       (nil    . (telephone-line-project-segment
+                  telephone-line-buffer-segment))))
+    :config (telephone-line-mode 1))
+#+end_src
+
+** More dashboard setup
+While the =my/dashboard= function sets up the buffer,
+this configuration describes the actual contents of the dashboard.
+This uses the [[https://github.com/emacs-dashboard/emacs-dashboard][dashboard]] package.
+#+begin_src elisp
+  (use-package dashboard
+    :custom
+    (dashboard-banner-logo-title "Welcome to Emacs!")
+    (dashboard-startup-banner (expand-file-name "splash.png" user-emacs-directory))
+    :config
+    (set-face-attribute 'dashboard-banner-logo-title nil :height 200))
+
+  (add-hook 'after-init-hook #'my/dashboard)
+#+end_src
+
+** Selection and completion interface
+[[https://github.com/minad/vertico][vertico]] is a modern and minimalistic completion UI.
+#+begin_src elisp
+  (use-package vertico
+    :custom
+    (vertico-count 30)
+    (vertico-cycle t)
+    :config (vertico-mode 1))
+#+end_src
+
+** Better syntax highlighting
+With [[https://github.com/emacs-tree-sitter/elisp-tree-sitter][tree-sitter]], much more complex syntax highlighting is possible,
+even when we don't have a language-specific mode installed!
+#+begin_src elisp
+  ;; better syntax highlighting
+  (use-package tree-sitter
+    :config (global-tree-sitter-mode 1)
+    :hook (tree-sitter-after-on . tree-sitter-hl-mode))
+
+  (use-package tree-sitter-langs)
+#+end_src
+
+** Indent guides
+A visual representation of where we are in an indented structure.
+[[https://github.com/DarthFennec/highlight-indent-guides][highlight-indent-guides]] is very adaptive and thus a perfect fit
+for languages with weird, dynamic indentation (looking at you, Haskell).
+#+begin_src elisp
+  ;; indent guides
+  (use-package highlight-indent-guides
+    :custom (highlight-indent-guides-responsive 'stack)
+    :hook (prog-mode . highlight-indent-guides-mode))
+#+end_src
+
+** Visible whitespace
+I want to see tabs and trailing whitespace.
+#+begin_src elisp
+  ;; show whitespace
+  (use-package whitespace
+    :config (global-whitespace-mode 1)
+    :custom (whitespace-style '(face tab-mark trailing missig-newline-at-eof)))
+#+end_src
+
+** Colored strings
+With [[https://elpa.gnu.org/packages/rainbow-mode.html][rainbow-mode]], color strings like #bb77ff get a background of their color.
+#+begin_src elisp
+  (use-package rainbow-mode
+    :config
+    (define-globalized-minor-mode my/global-rainbow-mode rainbow-mode
+      (lambda () (rainbow-mode 1)))
+    (my/global-rainbow-mode))
+#+end_src
+
+** Colored parentheses
+We need more rainbows. Or, in this case, gruv-bows?
+[[https://github.com/Fanael/rainbow-delimiters][Link to repo]]
+#+begin_src elisp
+  (use-package rainbow-delimiters
+    :hook prog-mode
+    :custom (rainbow-delimiters-max-face-count 6)
+    :config
+    (set-face-foreground 'rainbow-delimiters-depth-1-face "#cc241d")
+    (set-face-foreground 'rainbow-delimiters-depth-2-face "#98971a")
+    (set-face-foreground 'rainbow-delimiters-depth-3-face "#d79921")
+    (set-face-foreground 'rainbow-delimiters-depth-4-face "#458588")
+    (set-face-foreground 'rainbow-delimiters-depth-5-face "#b16286")
+    (set-face-foreground 'rainbow-delimiters-depth-6-face "#689d6a"))
+#+end_src
+
+* Popup control
+Popup windows can quickly become annoying.
+The [[https://github.com/emacsorphanage/popwin][popwin]] package allows closing them with just C-g.
+#+begin_src elisp
+  (use-package popwin
+    :config
+    ;;(push "*undo-tree*" popwin:special-display-config)
+    ;;(push "*Help*"      popwin:special-display-config)
+    (push "*Backtrace*" popwin:special-display-config)
+    (push '("^[*]" :regex t) popwin:special-display-config)
+    (popwin-mode 1))
+#+end_src
+
+* Temporary files
+Emacs leaves a lot of temporary files lying around, such as backups and autosaves.
+We shove all of them in a single directory next to the Emacs configuration.
+#+begin_src elisp
+  (defvar my/temp-dir (concat user-emacs-directory "temp/"))
+  (setq backup-directory-alist         `(("." . ,my/temp-dir))
+        auto-save-file-name-transforms `((".*"  ,my/temp-dir t))
+        auto-save-list-file-prefix               my/temp-dir)
+#+end_src
+
+* Helpers
+** Fill column
+For a long time, terminals were only 80 columns wide.
+Today, such tight space constrains no longer exist,
+but it is still nice to not write overly long lines.
+The fill column shows up as a thin bar on the 80th column.
+#+begin_src elisp
+  (add-hook 'display-fill-column-indicator-mode-hook
+            (lambda () (set-fill-column 80)))
+  (global-display-fill-column-indicator-mode)
+#+end_src
+
+** Show composite keybindings
+[[https://github.com/justbur/emacs-which-key][which-key]] shows possible continuations of a multi-part keybind.
+#+begin_src elisp
+  (use-package which-key
+    :custom
+    (which-key-idle-delay 0.5)
+    (which-key-idle-secondary-delay 0)
+    :config
+    (which-key-mode 1)
+    (which-key-setup-side-window-bottom))
+#+end_src
+
+** Frecency-based sorting
+[[https://github.com/radian-software/prescient.el][prescient]] sorts possible completions by frequency and recency ("frecency").
+#+begin_src elisp
+  (use-package prescient
+    :config (prescient-persist-mode 1)
+    :custom (prescient-save-file (concat my/temp-dir "prescient-save.el")))
+
+  (use-package vertico-prescient :config (vertico-prescient-mode 1))
+#+end_src
+
+** More selection functions
+[[https://github.com/minad/consult][consult]] offers lots of search and navigation functions, such as
+- selecting buffers
+- grepping for text
+- jumping to lines, headings or bookmarks
+and many more.
+#+begin_src elisp
+  (use-package consult :init (recentf-mode 1))
+#+end_src
+
+** More completion information
+[[https://github.com/minad/marginalia][Marginalia]] are annotations at the margin of page.
+Here, they show e.g. file permissions, function names or buffer types
+in the respective selection menus.
+#+begin_src elisp
+  (use-package marginalia :config (marginalia-mode 1))
+#+end_src
+
+** Git line status
+[[https://github.com/emacsorphanage/git-gutter][git-gutter]] shows the modification status of lines (added, changed, removed)
+in the "gutter" (left side of the window).
+#+begin_src elisp
+  (use-package git-gutter
+    :custom
+    (git-gutter:added-sign    "+")
+    (git-gutter:modified-sign "~")
+    (git-gutter:deleted-sign  "-")
+    (git-gutter:update-interval 2)
+    :config
+    (set-face-background 'git-gutter:added    nil)
+    (set-face-background 'git-gutter:modified nil)
+    (set-face-background 'git-gutter:deleted  nil)
+    (global-git-gutter-mode 1))
+#+end_src
+
+* Editing
+** Multiple cursors
+For when you need to edit EVEN MORE! [[https://github.com/magnars/multiple-cursors.el/][Pure magic]]
+#+begin_src elisp
+  (use-package multiple-cursors)
+#+end_src
+
+** Direct jumps
+Another pretty crazy feature:
+With [[https://github.com/abo-abo/avy][avy]] you can jump to *any* visible text with just a few keystrokes!
+#+begin_src elisp
+  (use-package avy
+    :custom
+    (avy-keys
+     (nconc
+      (number-sequence ?a ?z)
+      (number-sequence ?A ?Z)
+      (number-sequence ?1 ?9)
+      '(?0))))
+#+end_src
+
+** Undo tree
+Is this how timelords think?
+[[https://github.com/apchamberlain/undo-tree.el][undo-tree]] can visualize the entire undo/redo tree of a buffer
+and even lets us move around in it!
+#+begin_src elisp
+  (use-package undo-tree
+    :custom (undo-tree-history-directory-alist `(("." . ,my/temp-dir)))
+    :config (global-undo-tree-mode 1))
+#+end_src
+
+* Terminal
+[[https://codeberg.org/akib/emacs-eat][eat]]: Emulate A Terminal, is by far the best terminal emulator for emacs.
+It's faster than =term=, doesn't flicker, has more features...
+#+begin_src elisp
+  (use-package eat
+    :custom (eat-term-inside-emacs "vterm")
+    :bind (:map eat-semi-char-mode-map ("C-l" . #'my/eat-reset)))
+#+end_src
+
+* Programming basics
+** Trailing whitespace cleanup
+We don't like junk on our lines.
+#+begin_src elisp
+  (add-hook 'before-save-hook #'delete-trailing-whitespace)
+#+end_src
+
+** Projects
+The builtin project package is enough for my requirements.
+#+begin_src elisp
+  (use-package project)
+#+end_src
+
+** Autocompletion
+[[https://github.com/company-mode/company-mode][company-mode]] adds powerful autocompletion.
+We want to ignore casing and show it as soon as a word is typed.
+#+begin_src elisp
+  (use-package company
+    :hook (after-init . global-company-mode)
+    :custom
+    (company-dabbrev-downcase nil)
+    (company-dabbrev-ignore-case t)
+    (company-idle-delay 0)
+    (company-minimum-prefix-length 1)
+    (company-show-numbers t))
+#+end_src
+
+** Language server support
+[[https://github.com/emacs-lsp/lsp-mode][lsp-mode]] integrates into installed language servers.
+We start them deferred, this reduces peak load.
+#+begin_src elisp
+  (use-package lsp-mode
+    :custom (lsp-headerline-breadcrumb-enable nil)
+    :hook
+    (go-mode      . lsp-deferred)
+    (haskell-mode . lsp-deferred)
+    (nix-mode     . lsp-deferred))
+
+  (use-package lsp-ui
+    :custom
+    (lsp-ui-sideline-show-code-actions t)
+    (lsp-ui-sideline-show-diagnostics t)
+    (lsp-ui-sideline-show-hover nil))
+#+end_src
+
+** Formatting
+[[https://github.com/lassik/emacs-format-all-the-code][Format all the code!]] Automatic formatting on save.
+For Haskell, I am currently using [[https://github.com/haskell/stylish-haskell][stylish-haskell]],
+which is not the default setting.
+#+begin_src elisp
+  (use-package format-all
+    :hook prog-mode
+    (format-all-mode . format-all-ensure-formatter)
+    :config
+    (push '("Haskell" stylish-haskell) format-all-default-formatters))
+#+end_src
+
+** EditorConfig
+[[https://editorconfig.org/][EditorConfig]] automatically loads basic code formatting rules
+from a project's rule file.
+The Emacs plugin is [[https://github.com/editorconfig/editorconfig-emacs][here]].
+#+begin_src elisp
+  (use-package editorconfig :config (editorconfig-mode 1))
+#+end_src
+
+** Error checking
+[[https://github.com/flycheck/flycheck][Flycheck]] provides on-the-fly syntax & error checking.
+#+begin_src elisp
+  (use-package flycheck :config (global-flycheck-mode 1))
+#+end_src
+
+** Snippets
+[[https://github.com/joaotavora/yasnippet][Yasnippet]] is a template/snippet system for emacs.
+It is required by some language's autocompletion
+to correctly fill in function arguments and such things.
+#+begin_src elisp
+  (use-package yasnippet :config (yas-global-mode 1))
+#+end_src
+
+** TODO highlighting
+[[https://github.com/tarsius/hl-todo][hl-todo]] highlights TODO and some other keywords.
+#+begin_src elisp
+  (use-package hl-todo :config (global-hl-todo-mode 1))
+#+end_src
+
+** Electricity
+Automatic indentation and completion of pair characters (brackets, quotation marks, ...).
+Emacs calls this behaviour [[https://www.emacswiki.org/emacs/Electricity][Electricity]].
+#+begin_src elisp
+  (electric-indent-mode 1)
+  (electric-pair-mode   1)
+#+end_src
+
+** Direnv integration
+[[https://github.com/wbolster/emacs-direnv][direnv]] automatically loads project environments.
+Together with my [[https://github.com/nix-community/nix-direnv][nix-direnv]] setup on NixOS (dotfiles [[https://github.com/42LoCo42/.dotfiles/tree/nixos][here]]),
+this loads entire Nix flakes and enables Emacs
+to use the packages declared within.
+#+begin_src elisp
+  (use-package direnv :config (direnv-mode 1))
+#+end_src
+
+* Languages
+** Lisp
+We use two packages for lisp:
+- [[https://github.com/Lindydancer/lisp-extra-font-lock][lisp-extra-font-lock]] highlights local bindings and quoted expressions
+- [[https://github.com/justinbarclay/parinfer-rust-mode][parinfer]] makes writing Lisp easier by automatically adjusting parentheses and indentation
+#+begin_src elisp
+  (use-package lisp-extra-font-lock :config (lisp-extra-font-lock-global-mode 1))
+
+  (use-package parinfer-rust-mode
+    :hook emacs-lisp-mode
+    :custom
+    (parinfer-rust-library-directory my/temp-dir)
+    (parinfer-rust-auto-download t))
+#+end_src
+
+*** Some problems due to parinfer
+The magic of parinfer clashes with some other automatic adjustment modes,
+such as format-all-mode and the electric modes.
+Therefore, they need to be disabled.
+#+begin_src elisp
+  (add-hook
+   'emacs-lisp-mode-hook
+   #'(lambda ()
+       (format-all-mode 0)
+       (electric-indent-local-mode 0)
+       (electric-pair-local-mode 0)))
+#+end_src
+
+** Haskell
+C-x C-p is my language-specific action hotkey.
+For Haskell, it opens the interactive shell (REPL).
+We also define some hotkeys for it, as well as lsp-mode integration.
+[[https://github.com/haskell/haskell-mode][Link to repo]]
+#+begin_src elisp
+  (use-package haskell-mode
+    :bind (:map haskell-mode-map ("C-x C-p" . #'haskell-interactive-switch))
+    :hook
+    (haskell-interactive-mode
+     . (lambda ()
+         (bind-key "C-l" #'haskell-interactive-mode-clear            'haskell-interactive-mode-map)
+         (bind-key "C-n" #'haskell-interactive-mode-history-next     'haskell-interactive-mode-map)
+         (bind-key "C-p" #'haskell-interactive-mode-history-previous 'haskell-interactive-mode-map)
+         (bind-key "C-r"
+           (lambda () (interactive) (haskell-process-file-loadish "reload" t haskell-interactive-previous-buffer))
+           'haskell-interactive-mode-map))))
+
+  (use-package lsp-haskell)
+#+end_src
+
+** Go
+Nothing fancy here. [[https://github.com/dominikh/go-mode.el][Link to repo]]
+#+begin_src elisp
+  (use-package go-mode)
+#+end_src
+
+** Rust
+Instead of the official [[https://github.com/rust-lang/rust-mode][rust-mode]], we use [[https://github.com/brotzeit/rustic][rustic]].
+It wraps rust-mode with more features and provides automatic lsp-mode integration.
+#+begin_src elisp
+  (use-package rustic)
+#+end_src
+
+** HTML
+We need to explicitly set the indentation here again,
+since it uses a custom variable.
+sgml-mode is a builtin mode.
+#+begin_src elisp
+  (use-package sgml-mode
+    :custom (sgml-basic-offset 4))
+#+end_src
+
+** Org
+The language this document is written in!
+We enable indentation of text under headers
+and syntax highlighting in the HTML export with [[https://github.com/hniksic/emacs-htmlize][htmlize]].
+#+begin_src elisp
+  (add-hook 'org-mode-hook #'org-indent-mode)
+  (use-package htmlize)
+#+end_src
+
+** Nix
+Nothing fancy here too. [[https://github.com/NixOS/nix-mode][Link to repo]]
+#+begin_src elisp
+  (use-package nix-mode)
+#+end_src
+
+** Structured data
+[[https://github.com/joshwnj/json-mode][JSON]] and [[https://github.com/yoshiki/yaml-mode][YAML]] are data serialization languages (they describe data, not code).
+#+begin_src elisp
+  (use-package json-mode)
+  (use-package yaml-mode)
+#+end_src
+
+* Keybindings
+** A helper
+To always override existing keybinds in some modes with my own,
+I have designed this little helper macro.
+It allows me to write my keybinds as one huge expression
+instead of many separate calls to =bind-key*=.
+#+begin_src elisp
+  (defmacro my/bind-keys* (&rest body)
+    "Globally bind all keys.
+  BODY: a list of alternating key-function arguments."
+    `(progn
+       ,@(cl-loop
+          while body collecting
+          `(bind-key* ,(pop body) ,(pop body)))))
+#+end_src
+
+** Principles
+- When a modifier key is pressed, it is held for the rest of the keybind
+- C-x is for general actions
+- C-c is for code actions.
+- Very important actions have no prefix, they are a single hotkey
+- Meta (Alt) roughly corresponds to a "bigger" version of the same hotkey with Control
+
+** Menus
+#+begin_src elisp
+  (my/bind-keys*
+   "C-x C-b" #'consult-bookmark
+   "C-x C-f" #'find-file
+   "C-x C-g" #'consult-ripgrep
+   "C-x C-m" #'consult-minor-mode-menu
+   "C-x C-o" #'consult-outline
+   "C-x C-s" #'consult-buffer
+   "C-x C-u" #'undo-tree-visualize)
+#+end_src
+
+** Window controls
+#+begin_src elisp
+  (my/bind-keys*
+   "C-<next>"  #'centaur-tabs-forward
+   "C-<prior>" #'centaur-tabs-backward
+   "C-x C-0"   #'delete-window
+   "C-x C-1"   #'delete-other-windows
+   "C-x C-2"   #'my/split-switch-below
+   "C-x C-3"   #'my/split-switch-right
+   "C-x C-4"   #'kill-buffer-and-window)
+#+end_src
+
+** Movement
+#+begin_src elisp
+  (my/bind-keys*
+   "C-#"   (lambda () (interactive) (select-window (next-window)))
+   "C-M-#" (lambda () (interactive) (select-window (previous-window)))
+   "C-a"   #'my/smart-home
+   "M-c"   #'avy-goto-char
+   "M-l"   #'consult-goto-line
+   "M-n"   #'scroll-up-command
+   "M-p"   #'scroll-down-command
+   "M-s"   #'consult-line)
+#+end_src
+
+** Editing
+#+begin_src elisp
+  (my/bind-keys*
+   "C-,"     #'mc/mark-previous-like-this
+   "C-."     #'mc/mark-next-like-this
+   "C-<tab>" #'format-all-buffer
+   "C-s"     #'save-buffer
+   "C-y"     #'undo-tree-redo
+   "C-z"     #'undo-tree-undo)
+#+end_src
+
+** Language server actions
+#+begin_src elisp
+  (my/bind-keys*
+   "C-c C-a"     #'lsp-execute-code-action
+   "C-c C-f C-d" #'lsp-ui-peek-find-definitions
+   "C-c C-f C-i" #'lsp-ui-peek-find-implementation
+   "C-c C-f C-r" #'lsp-ui-peek-find-references
+   "C-c C-o"     #'lsp-organize-imports
+   "C-c C-r"     #'lsp-rename)
+#+end_src
+
+** Text scale adjustment
+#+begin_src elisp
+  (my/bind-keys*
+   "C-+" #'text-scale-increase
+   "C--" #'text-scale-decrease
+   "C-=" #'text-scale-mode)
+#+end_src
+
+** Other utilities
+#+begin_src elisp
+  (my/bind-keys*
+   "C-x C-a" #'mark-whole-buffer
+   "C-x C-k" (lambda () (interactive) (kill-buffer (current-buffer)))
+   "C-x C-r" (lambda () (interactive) (load-file user-init-file))
+   "C-x C-t" #'my/switch-to-terminal)
+#+end_src
+
+** Help
+#+begin_src elisp
+  (my/bind-keys*
+   "C-h C-b" #'describe-personal-keybindings
+   "C-h C-f" #'describe-function
+   "C-h C-k" #'describe-key
+   "C-h C-m" #'consult-man
+   "C-h C-v" #'describe-variable)
+#+end_src
+
+** cua-mode
+The Common User Access system (CUA) enables some keybindings
+found in standard text editors, such as
+- C-c for copying a region
+- C-x for cutting a region
+- C-v for pasting the current clipboard
+These keybindings are only active when a region is selected,
+otherwise they are just prefixes to other keybindings.
+But for that to work, cua-mode must be enabled last.
+It also overrides the M-v keybind, which I don't want to happen.
+#+begin_src elisp
+  (cua-mode 1)
+  (bind-key "M-v" #'consult-yank-from-kill-ring 'cua--cua-keys-keymap)
+#+end_src
+
+* Startup message
+Send a notification when Emacs has started up.
+#+begin_src elisp
+  (start-process
+   "startup-notify" nil
+   "notify-send" "emacs"
+   (format "Startup took %s!" (emacs-init-time)))
+#+end_src
