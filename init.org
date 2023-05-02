@@ -557,7 +557,9 @@ Together with my [[https://github.com/nix-community/nix-direnv][nix-direnv]] set
 this loads entire Nix flakes and enables Emacs
 to use the packages declared within.
 #+begin_src elisp
-  (use-package direnv :config (direnv-mode 1))
+  (use-package direnv
+    :config (direnv-mode 1)
+    :custom (direnv-always-show-summary nil))
 #+end_src
 
 * Languages
