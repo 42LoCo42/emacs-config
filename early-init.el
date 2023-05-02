@@ -10,3 +10,4 @@
 
 (setq package-enable-at-startup nil)
 (org-babel-load-file (expand-file-name "init.org" user-emacs-directory))
+(delete-file (expand-file-name "init.el" user-emacs-directory))
