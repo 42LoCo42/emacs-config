@@ -723,7 +723,8 @@ instead of many separate calls to =bind-key*=.
    "C-<tab>" #'format-all-buffer
    "C-s"     #'save-buffer
    "C-y"     #'undo-tree-redo
-   "C-z"     #'undo-tree-undo)
+   "C-z"     #'undo-tree-undo
+   "M-v"     #'consult-yank-from-kill-ring)
 #+end_src
 
 ** Language server actions
@@ -769,14 +770,20 @@ The Common User Access system (CUA) enables some keybindings
 found in standard text editors, such as
 - C-c for copying a region
 - C-x for cutting a region
-- C-v for pasting the current clipboard
 These keybindings are only active when a region is selected,
 otherwise they are just prefixes to other keybindings.
 But for that to work, cua-mode must be enabled last.
-It also overrides the M-v keybind, which I don't want to happen.
+We also don't want CUA do touch C-v, since we define it ourselves.
 #+begin_src elisp
+  (setq cua-remap-control-v nil)
   (cua-mode 1)
-  (bind-key "M-v" #'consult-yank-from-kill-ring 'cua--cua-keys-keymap)
+#+end_src
+
+** Paste
+We want to use cua-paste everywhere *except* in the terminal.
+#+begin_src elisp
+  (bind-key "C-v" #'cua-paste)
+  (bind-key "C-v" #'eat-yank 'eat-semi-char-mode-map)
 #+end_src
 
 * Startup message
