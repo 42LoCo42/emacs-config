@@ -503,6 +503,15 @@ We start them deferred, this reduces peak load.
     (lsp-ui-sideline-show-hover nil))
 #+end_src
 
+** xref setup
+Consult provices a selection function for xref.
+We also disable the symbol selection in xref-find-references.
+#+begin_src elisp
+  (setq xref-show-xrefs-function       #'consult-xref
+        xref-show-definitions-function #'consult-xref
+        xref-prompt-for-identifier     nil)
+#+end_src
+
 ** Formatting
 [[https://github.com/lassik/emacs-format-all-the-code][Format all the code!]] Automatic formatting on save.
 For Haskell, I am currently using [[https://github.com/haskell/stylish-haskell][stylish-haskell]],
@@ -684,6 +693,7 @@ instead of many separate calls to =bind-key*=.
    "C-x C-b" #'consult-bookmark
    "C-x C-f" #'find-file
    "C-x C-g" #'consult-ripgrep
+   "C-x C-i" #'consult-imenu
    "C-x C-m" #'consult-minor-mode-menu
    "C-x C-o" #'consult-outline
    "C-x C-s" #'consult-buffer
@@ -731,9 +741,9 @@ instead of many separate calls to =bind-key*=.
 #+begin_src elisp
   (my/bind-keys*
    "C-c C-a"     #'lsp-execute-code-action
-   "C-c C-f C-d" #'lsp-ui-peek-find-definitions
-   "C-c C-f C-i" #'lsp-ui-peek-find-implementation
-   "C-c C-f C-r" #'lsp-ui-peek-find-references
+   "C-c C-f C-d" #'xref-find-definitions
+   "C-c C-f C-i" #'lsp-find-implementation
+   "C-c C-f C-r" #'xref-find-references
    "C-c C-o"     #'lsp-organize-imports
    "C-c C-r"     #'lsp-rename)
 #+end_src
