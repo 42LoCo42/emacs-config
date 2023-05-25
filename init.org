@@ -1,4 +1,4 @@
-#+HTML_HEAD:  <link rel="stylesheet" type="text/css" href="https://eleonora.gay/emacs/style.css" />
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="https://eleonora.gay/emacs/style.css" />
 #+TITLE: My Emacs configuration
 #+SUBTITLE: [[https://github.com/42LoCo42/emacs-config]]
 
@@ -390,7 +390,9 @@ The fill column shows up as a thin bar on the 80th column.
 - jumping to lines, headings or bookmarks
 and many more.
 #+begin_src elisp
-  (use-package consult :init (recentf-mode 1))
+  (use-package consult
+    :init (recentf-mode 1)
+    :custom (completion-in-region-function #'consult-completion-in-region))
 #+end_src
 
 ** More completion information
