@@ -96,6 +96,7 @@ The third function resets the terminal.
     "Reset eat and input newline."
     (interactive)
     (eat-reset)
+    (eat-self-input 1 ?\x15)
     (eat-self-input 1 ?\n))
 #+end_src
 
@@ -457,7 +458,11 @@ It's faster than =term=, doesn't flicker, has more features...
 #+begin_src elisp
   (use-package eat
     :custom (eat-term-inside-emacs "vterm")
-    :bind (:map eat-semi-char-mode-map ("C-l" . #'my/eat-reset)))
+    :bind (:map eat-semi-char-mode-map
+                ("M-DEL" . #'eat-self-input)
+                ("C-a"   . #'eat-self-input)
+                ("C-u"   . #'eat-self-input)
+                ("C-l"   . #'my/eat-reset)))
 #+end_src
 
 * Programming basics
@@ -716,10 +721,10 @@ instead of many separate calls to =bind-key*=.
 
 ** Movement
 #+begin_src elisp
+  (bind-key "C-a" #'my/smart-home)
   (my/bind-keys*
    "C-#"   (lambda () (interactive) (select-window (next-window)))
    "C-M-#" (lambda () (interactive) (select-window (previous-window)))
-   "C-a"   #'my/smart-home
    "M-c"   #'avy-goto-char
    "M-l"   #'consult-goto-line
    "M-n"   #'scroll-up-command
