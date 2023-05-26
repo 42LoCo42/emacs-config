@@ -127,6 +127,16 @@ The logo should be centered both vertically and horizontally.
     (message nil))
 #+end_src
 
+** Haskell process reload
+This function reloads the REPL of haskell-mode.
+#+begin_src elisp
+  (defun my/haskell-reload ()
+    (interactive)
+    (haskell-process-file-loadish
+     "reload" t
+     (or haskell-interactive-previous-buffer (current-buffer))))
+#+end_src
+
 * General configuration
 ** Some modes
 We don't want:
@@ -336,6 +346,7 @@ The [[https://github.com/emacsorphanage/popwin][popwin]] package allows closing 
     ;;(push "*undo-tree*" popwin:special-display-config)
     ;;(push "*Help*"      popwin:special-display-config)
     (push "*Backtrace*" popwin:special-display-config)
+    (push "*hoogle*"    popwin:special-display-config)
     (push '("^[*]" :regex t) popwin:special-display-config)
     (popwin-mode 1))
 #+end_src
@@ -607,22 +618,21 @@ Therefore, they need to be disabled.
 #+end_src
 
 ** Haskell
-C-x C-p is my language-specific action hotkey.
-For Haskell, it opens the interactive shell (REPL).
-We also define some hotkeys for it, as well as lsp-mode integration.
+Define hotkeys for Haskell and its REPL and enable automatic reload on save.
 [[https://github.com/haskell/haskell-mode][Link to repo]]
 #+begin_src elisp
   (use-package haskell-mode
-    :bind (:map haskell-mode-map ("C-x C-p" . #'haskell-interactive-switch))
+    :bind (:map haskell-mode-map
+                ("C-c C-h" . #'hoogle)
+                ("C-c C-p" . #'haskell-interactive-switch))
     :hook
+    (haskell-mode . (lambda () (add-hook 'after-save-hook #'my/haskell-reload)))
     (haskell-interactive-mode
      . (lambda ()
          (bind-key "C-l" #'haskell-interactive-mode-clear            'haskell-interactive-mode-map)
          (bind-key "C-n" #'haskell-interactive-mode-history-next     'haskell-interactive-mode-map)
          (bind-key "C-p" #'haskell-interactive-mode-history-previous 'haskell-interactive-mode-map)
-         (bind-key "C-r"
-           (lambda () (interactive) (haskell-process-file-loadish "reload" t haskell-interactive-previous-buffer))
-           'haskell-interactive-mode-map))))
+         (bind-key "C-r" #'my/haskell-reload                         'haskell-interactive-mode-map))))
 
   (use-package lsp-haskell)
 #+end_src
