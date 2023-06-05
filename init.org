@@ -137,6 +137,22 @@ This function reloads the REPL of haskell-mode.
      (or haskell-interactive-previous-buffer (current-buffer))))
 #+end_src
 
+** Open today's Org file
+This function lets the user select a project folder
+and opens the Org file with the current ISO 8601 date as the name.
+#+begin_src elisp
+  (defun my/todays-org-file (directory)
+    "Opens the Org file for today in DIRECTORY.
+  It has the filename year-month-day.org"
+    (interactive "Ddirectory: ")
+    (let* ((date  (calendar-current-date))
+           (month (car   date))
+           (day   (cadr  date))
+           (year  (caddr date))
+           (file  (format "%04d-%02d-%02d.org" year month day)))
+      (find-file (expand-file-name file directory))))
+#+end_src
+
 * General configuration
 ** Some modes
 We don't want:
