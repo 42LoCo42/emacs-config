@@ -175,6 +175,11 @@ We want:
   (global-prettify-symbols-mode 1)
 #+end_src
 
+** More recentf items
+#+begin_src elisp
+  (setq recentf-max-saved-items 100)
+#+end_src
+
 ** More miscellaneous settings
 No startup screen (we have our own dashboard).
 No initial message in the scratch buffer.
