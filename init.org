@@ -204,7 +204,7 @@ and I will fight anyone who dare says otherwise.
 [[https://github.com/greduan/emacs-theme-gruvbox][Link to repo]]
 #+begin_src elisp
   (use-package gruvbox-theme
-    :custom (custom-safe-themes '("72ed8b6bffe0bfa8d097810649fd57d2b598deef47c992920aef8b5d9599eefe" default))
+    :custom (custom-safe-themes '("046a2b81d13afddae309930ef85d458c4f5d278a69448e5a5261a5c78598e012" default))
     :config (load-theme 'gruvbox-dark-medium))
 #+end_src
 
@@ -347,7 +347,7 @@ We need more rainbows. Or, in this case, gruv-bows?
 [[https://github.com/Fanael/rainbow-delimiters][Link to repo]]
 #+begin_src elisp
   (use-package rainbow-delimiters
-    :hook prog-mode
+    :hook (prog-mode . rainbow-delimiters-mode)
     :custom (rainbow-delimiters-max-face-count 6)
     :config
     (set-face-foreground 'rainbow-delimiters-depth-1-face "#cc241d")
@@ -531,9 +531,11 @@ We start them deferred, this reduces peak load.
   (use-package lsp-mode
     :custom (lsp-headerline-breadcrumb-enable nil)
     :hook
+    (c-mode       . lsp-deferred)
     (go-mode      . lsp-deferred)
     (haskell-mode . lsp-deferred)
-    (nix-mode     . lsp-deferred))
+    (nix-mode     . lsp-deferred)
+    (python-mode  . lsp-deferred))
 
   (use-package lsp-ui
     :custom
@@ -557,7 +559,7 @@ For Haskell, I am currently using [[https://github.com/haskell/stylish-haskell][
 which is not the default setting.
 #+begin_src elisp
   (use-package format-all
-    :hook prog-mode
+    :hook (prog-mode . format-all-mode)
     (format-all-mode . format-all-ensure-formatter)
     :config
     (push '("Haskell" stylish-haskell) format-all-default-formatters))
@@ -636,6 +638,12 @@ Therefore, they need to be disabled.
        (format-all-mode 0)
        (electric-indent-local-mode 0)
        (electric-pair-local-mode 0)))
+#+end_src
+
+** C
+Indents are 4 spaces wide.
+#+begin_src elisp
+  (setq c-basic-offset 4)
 #+end_src
 
 ** Haskell
