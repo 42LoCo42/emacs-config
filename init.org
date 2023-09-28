@@ -528,7 +528,10 @@ We want to ignore casing and show it as soon as a word is typed.
 We start them deferred, this reduces peak load.
 #+begin_src elisp
   (use-package lsp-mode
-    :custom (lsp-headerline-breadcrumb-enable nil)
+    :custom
+    (eldoc-idle-delay 0)
+    (lsp-idle-delay 0)
+    (lsp-headerline-breadcrumb-enable nil)
     :hook
     (c-mode       . lsp-deferred)
     (go-mode      . lsp-deferred)
@@ -540,7 +543,10 @@ We start them deferred, this reduces peak load.
     :custom
     (lsp-ui-sideline-show-code-actions t)
     (lsp-ui-sideline-show-diagnostics t)
-    (lsp-ui-sideline-show-hover nil))
+    (lsp-ui-sideline-show-hover nil)
+    (lsp-ui-sideline-delay 0)
+    (lsp-ui-doc-delay 0)
+    (lsp-ui-doc-show-with-cursor t))
 #+end_src
 
 ** xref setup
