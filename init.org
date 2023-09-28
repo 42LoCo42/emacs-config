@@ -469,9 +469,8 @@ With [[https://github.com/abo-abo/avy][avy]] you can jump to *any* visible text 
     (avy-keys
      (nconc
       (number-sequence ?a ?z)
-      (number-sequence ?A ?Z)
-      (number-sequence ?1 ?9)
-      '(?0))))
+      ;; (number-sequence ?A ?Z)
+      (number-sequence ?0 ?9))))
 #+end_src
 
 ** Undo tree
@@ -636,6 +635,7 @@ Therefore, they need to be disabled.
    'emacs-lisp-mode-hook
    #'(lambda ()
        (format-all-mode 0)
+       (indent-tabs-mode 0)
        (electric-indent-local-mode 0)
        (electric-pair-local-mode 0)))
 #+end_src
@@ -658,6 +658,7 @@ Define hotkeys for Haskell and its REPL and enable automatic reload on save.
     (haskell-mode . (lambda () (add-hook 'after-save-hook #'my/haskell-reload)))
     (haskell-interactive-mode
      . (lambda ()
+         (bind-key "C-a" #'haskell-interactive-mode-beginning        'haskell-interactive-mode-map)
          (bind-key "C-l" #'haskell-interactive-mode-clear            'haskell-interactive-mode-map)
          (bind-key "C-n" #'haskell-interactive-mode-history-next     'haskell-interactive-mode-map)
          (bind-key "C-p" #'haskell-interactive-mode-history-previous 'haskell-interactive-mode-map)
@@ -676,7 +677,8 @@ Nothing fancy here. [[https://github.com/dominikh/go-mode.el][Link to repo]]
 Instead of the official [[https://github.com/rust-lang/rust-mode][rust-mode]], we use [[https://github.com/brotzeit/rustic][rustic]].
 It wraps rust-mode with more features and provides automatic lsp-mode integration.
 #+begin_src elisp
-  (use-package rustic)
+  (use-package rustic
+   :custom (lsp-rust-analyzer-cargo-watch-command "clippy"))
 #+end_src
 
 ** HTML
@@ -765,6 +767,8 @@ instead of many separate calls to =bind-key*=.
    "C-#"   (lambda () (interactive) (select-window (next-window)))
    "C-M-#" (lambda () (interactive) (select-window (previous-window)))
    "M-c"   #'avy-goto-char
+   "M-e"   #'forward-word
+   "M-f"   #'forward-to-word
    "M-l"   #'consult-goto-line
    "M-n"   #'scroll-up-command
    "M-p"   #'scroll-down-command
