@@ -56,6 +56,17 @@ They also balance the window layout.
     (other-window 1))
 #+end_src
 
+** Repeatably join a line
+This wraps the standard function ~join-line~ by moving to the start of the next line,
+where it can be reapplied immediately to quickly join multiple lines.
+#+begin_src elisp
+  (defun my/join-line ()
+    (interactive)
+    (join-line)
+    (forward-line 1)
+    (back-to-indentation))
+#+end_src
+
 ** A smarter C-a
 This function allows jumping to the start of the line
 or the first non-whitespace character just by calling it repeatedly.
@@ -798,13 +809,14 @@ instead of many separate calls to =bind-key*=.
 ** Editing
 #+begin_src elisp
   (my/bind-keys*
-   "C-,"     #'mc/mark-previous-like-this
-   "C-."     #'mc/mark-next-like-this
-   "C-<tab>" #'format-all-buffer
-   "C-s"     #'save-buffer
-   "C-y"     #'undo-tree-redo
-   "C-z"     #'undo-tree-undo
-   "M-v"     #'consult-yank-from-kill-ring)
+   "C-,"             #'mc/mark-previous-like-this
+   "C-."             #'mc/mark-next-like-this
+   "C-<tab>"         #'format-all-buffer
+   "C-M-<backspace>" #'my/join-line
+   "C-s"             #'save-buffer
+   "C-y"             #'undo-tree-redo
+   "C-z"             #'undo-tree-undo
+   "M-v"             #'consult-yank-from-kill-ring)
 #+end_src
 
 ** Language server actions
