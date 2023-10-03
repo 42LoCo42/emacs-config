@@ -548,8 +548,11 @@ We start them deferred, this reduces peak load.
   (use-package lsp-mode
     :custom
     (eldoc-idle-delay 0)
-    (lsp-idle-delay 0)
     (lsp-headerline-breadcrumb-enable nil)
+    (lsp-idle-delay 0)
+    (lsp-inlay-hint-enable t)
+    (lsp-log-io nil)
+    (read-process-output-max (* 1024 1024))
     :hook
     (c-mode       . lsp-deferred)
     (go-mode      . lsp-deferred)
