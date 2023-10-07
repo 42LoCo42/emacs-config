@@ -233,6 +233,12 @@ We use [[https://typeof.net/Iosevka/][Iosevka]] as a basis for [[https://www.ner
   (set-frame-font my/default-font)
 #+end_src
 
+** Transparency
+Since I use emacs-pgtk-29, this works perfectly!
+#+begin_src elisp
+  (push '(alpha-background . 50) default-frame-alist)
+#+end_src
+
 ** Tab width
 4 spaces by default.
 #+begin_src elisp
