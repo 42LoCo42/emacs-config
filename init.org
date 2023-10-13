@@ -233,6 +233,12 @@ We use [[https://typeof.net/Iosevka/][Iosevka]] as a basis for [[https://www.ner
   (set-frame-font my/default-font)
 #+end_src
 
+** Transparency
+Since I use emacs-pgtk-29, this works perfectly!
+#+begin_src elisp
+  (push '(alpha-background . 50) default-frame-alist)
+#+end_src
+
 ** Tab width
 4 spaces by default.
 #+begin_src elisp
@@ -365,7 +371,6 @@ We need more rainbows. Or, in this case, gruv-bows?
 [[https://github.com/Fanael/rainbow-delimiters][Link to repo]]
 #+begin_src elisp
   (use-package rainbow-delimiters
-    :hook (prog-mode . rainbow-delimiters-mode)
     :custom (rainbow-delimiters-max-face-count 6)
     :config
     (set-face-foreground 'rainbow-delimiters-depth-1-face "#cc241d")
@@ -373,7 +378,11 @@ We need more rainbows. Or, in this case, gruv-bows?
     (set-face-foreground 'rainbow-delimiters-depth-3-face "#d79921")
     (set-face-foreground 'rainbow-delimiters-depth-4-face "#458588")
     (set-face-foreground 'rainbow-delimiters-depth-5-face "#b16286")
-    (set-face-foreground 'rainbow-delimiters-depth-6-face "#689d6a"))
+    (set-face-foreground 'rainbow-delimiters-depth-6-face "#689d6a")
+
+    (define-globalized-minor-mode my/global-raindow-delims-mode rainbow-delimiters-mode
+      (lambda () (rainbow-delimiters-mode 1)))
+    (my/global-raindow-delims-mode 1))
 #+end_src
 
 * Popup control
