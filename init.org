@@ -555,6 +555,8 @@ We start them deferred, this reduces peak load.
     (read-process-output-max (* 1024 1024))
     :hook
     (c-mode       . lsp-deferred)
+    (elixir-mode  . lsp-deferred)
+    (gleam-mode   . lsp-deferred)
     (go-mode      . lsp-deferred)
     (haskell-mode . lsp-deferred)
     (nix-mode     . lsp-deferred)
@@ -708,6 +710,19 @@ It wraps rust-mode with more features and provides automatic lsp-mode integratio
    :custom (lsp-rust-analyzer-cargo-watch-command "clippy"))
 #+end_src
 
+** Elixir
+#+begin_src elisp
+  (use-package elixir-mode)
+#+end_src
+
+** Gleam
+#+begin_src elisp
+  (use-package tree-sitter-indent)
+  (use-package gleam-mode
+    :straight (:type git :host github :repo "gleam-lang/gleam-mode"
+                     :files ("*.el" "tree-sitter-gleam")))
+#+end_src
+
 ** HTML
 We need to explicitly set the indentation here again,
 since it uses a custom variable.
@@ -826,6 +841,7 @@ instead of many separate calls to =bind-key*=.
 #+begin_src elisp
   (my/bind-keys*
    "C-c C-a"     #'lsp-execute-code-action
+   "C-c C-d"     #'lsp-ui-doc-focus-frame
    "C-c C-f C-d" #'xref-find-definitions
    "C-c C-f C-i" #'lsp-find-implementation
    "C-c C-f C-r" #'xref-find-references
