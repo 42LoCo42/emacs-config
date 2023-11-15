@@ -613,7 +613,9 @@ The Emacs plugin is [[https://github.com/editorconfig/editorconfig-emacs][here]]
 ** Error checking
 [[https://github.com/flycheck/flycheck][Flycheck]] provides on-the-fly syntax & error checking.
 #+begin_src elisp
-  (use-package flycheck :config (global-flycheck-mode 1))
+  (use-package flycheck
+    :custom (flycheck-display-errors-delay 0)
+    :config (global-flycheck-mode 1))
 #+end_src
 
 ** Snippets
