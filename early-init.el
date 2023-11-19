@@ -10,5 +10,6 @@
    (message "gc-cons-threshold restored to %s" gc-cons-threshold)))
 
 (setq package-enable-at-startup nil)
+(defalias 'greaterthan #'>) ; > breaks rainbow-delimiters in init.org
 (org-babel-load-file (expand-file-name "init.org" user-emacs-directory))
 (delete-file (expand-file-name "init.el" user-emacs-directory))

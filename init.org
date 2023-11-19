@@ -56,6 +56,17 @@ They also balance the window layout.
     (other-window 1))
 #+end_src
 
+** bspwm-like window splitting
+Automatically selects the next split direction.
+Inspired by this post: https://www.reddit.com/r/tmux/comments/j7fcr7/tiling_in_tmux_as_in_bspwm
+#+begin_src elisp
+  (defun my/autosplit ()
+    (interactive)
+    (if (greaterthan 0 (- (* 8 (window-total-width)) (* 20 (window-total-height))))
+      (my/split-switch-below)
+      (my/split-switch-right)))
+#+end_src
+
 ** Repeatably join a line
 This wraps the standard function ~join-line~ by moving to the start of the next line,
 where it can be reapplied immediately to quickly join multiple lines.
@@ -657,6 +668,7 @@ We use two packages for lisp:
 - [[https://github.com/Lindydancer/lisp-extra-font-lock][lisp-extra-font-lock]] highlights local bindings and quoted expressions
 - [[https://github.com/justinbarclay/parinfer-rust-mode][parinfer]] makes writing Lisp easier by automatically adjusting parentheses and indentation
 #+begin_src elisp
+  (put 'if 'lisp-indent-function 'defun) ; indent if normally
   (use-package lisp-extra-font-lock :config (lisp-extra-font-lock-global-mode 1))
 
   (use-package parinfer-rust-mode
@@ -811,13 +823,14 @@ instead of many separate calls to =bind-key*=.
 ** Window controls
 #+begin_src elisp
   (my/bind-keys*
-   "C-<next>"  #'centaur-tabs-forward
-   "C-<prior>" #'centaur-tabs-backward
-   "C-x C-0"   #'delete-window
-   "C-x C-1"   #'delete-other-windows
-   "C-x C-2"   #'my/split-switch-below
-   "C-x C-3"   #'my/split-switch-right
-   "C-x C-4"   #'kill-buffer-and-window)
+   "C-<next>"     #'centaur-tabs-forward
+   "C-<prior>"    #'centaur-tabs-backward
+   "C-M-<return>" #'my/autosplit
+   "C-x C-0"      #'delete-window
+   "C-x C-1"      #'delete-other-windows
+   "C-x C-2"      #'my/split-switch-below
+   "C-x C-3"      #'my/split-switch-right
+   "C-x C-4"      #'kill-buffer-and-window)
 #+end_src
 
 ** Movement
