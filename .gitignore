@@ -1,5 +1,6 @@
 *
 !/.gitignore
+!/README.org
 !/daemon/run
 !/early-init.el
 !/init.org

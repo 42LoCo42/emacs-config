@@ -205,8 +205,8 @@ We want:
 ** Spell checking
 [[http://aspell.net/][Aspell]] is a modern replacement for ispell with full UTF-8 support.
 #+begin_src elisp
-  (setq ispell-program-name: "aspell"
-        ispell-dictionary: "de_DE")
+  (setq ispell-program-name "aspell"
+        ispell-dictionary "de_DE")
 #+end_src
 
 ** More miscellaneous settings
@@ -240,8 +240,8 @@ and I will fight anyone who dare says otherwise.
 ** Font
 We use [[https://typeof.net/Iosevka/][Iosevka]] as a basis for [[https://www.nerdfonts.com/][Nerd Fonts]]
 #+begin_src elisp
-  (defvar my/default-font "IosevkaNerdFontMono")
-  (set-frame-font my/default-font)
+  (defvar my/default-font "Iosevka NFM")
+  (set-face-attribute 'default nil :font my/default-font)
 #+end_src
 
 ** Transparency
@@ -574,13 +574,15 @@ We start them deferred, this reduces peak load.
     (lsp-log-io nil)
     (read-process-output-max (* 1024 1024))
     :hook
-    (c-mode       . lsp-deferred)
-    (elixir-mode  . lsp-deferred)
-    (gleam-mode   . lsp-deferred)
-    (go-mode      . lsp-deferred)
-    (haskell-mode . lsp-deferred)
-    (nix-mode     . lsp-deferred)
-    (python-mode  . lsp-deferred))
+    (c-mode          . lsp-deferred)
+    (elixir-mode     . lsp-deferred)
+    (gleam-mode      . lsp-deferred)
+    (go-mode         . lsp-deferred)
+    (haskell-mode    . lsp-deferred)
+    (javascript-mode . lsp-deferred)
+    (nix-mode        . lsp-deferred)
+    (python-mode     . lsp-deferred)
+    (typescript-mode . lsp-deferred))
 
   (use-package lsp-ui
     :custom
@@ -610,7 +612,8 @@ which is not the default setting.
     :hook (prog-mode . format-all-mode)
     (format-all-mode . format-all-ensure-formatter)
     :config
-    (push '("Haskell" stylish-haskell) format-all-default-formatters))
+    (setq-default format-all-formatters '(("Haskell" stylish-haskell)
+                                          ("HTML"    prettier))))
 #+end_src
 
 ** EditorConfig
@@ -738,6 +741,12 @@ It wraps rust-mode with more features and provides automatic lsp-mode integratio
   (use-package elixir-mode)
 #+end_src
 
+** Idris 2
+#+begin_src elisp
+  (use-package idris2-mode
+      :straight (:type git :host github :repo "idris-community/idris2-mode"))
+#+end_src
+
 ** Gleam
 #+begin_src elisp
   (use-package tree-sitter-indent)
@@ -753,6 +762,11 @@ sgml-mode is a builtin mode.
 #+begin_src elisp
   (use-package sgml-mode
     :custom (sgml-basic-offset 4))
+#+end_src
+
+** Typescript
+#+begin_src elisp
+  (use-package typescript-mode)
 #+end_src
 
 ** Org
