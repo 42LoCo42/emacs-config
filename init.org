@@ -396,6 +396,13 @@ We need more rainbows. Or, in this case, gruv-bows?
     (my/global-raindow-delims-mode 1))
 #+end_src
 
+** Smooth scrolling
+Default emacs "scrolling" behaviour sucks tbh.
+#+begin_src elisp
+  (use-package smooth-scrolling
+    :config (smooth-scrolling-mode 1))
+#+end_src
+
 * Popup control
 Popup windows can quickly become annoying.
 The [[https://github.com/emacsorphanage/popwin][popwin]] package allows closing them with just C-g.
