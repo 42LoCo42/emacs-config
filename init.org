@@ -263,6 +263,7 @@ We use relative line numbers because they make relative jumps easier
   (use-package display-line-numbers
     :custom (display-line-numbers-type 'relative)
     :config
+    (set-face-foreground 'line-number "#ebdbb2")
     (set-face-background 'line-number nil)
     (global-display-line-numbers-mode 1))
 #+end_src
