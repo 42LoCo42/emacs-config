@@ -1,6 +1,11 @@
 #+TITLE: My Emacs configuration
 #+SUBTITLE: [[https://github.com/42LoCo42/emacs-config]]
 
+** *⚠️ ACHTUNG ⚠️ :: Now part of my NixOS dotfiles*
+https://github.com/42LoCo42/.dotfiles/blob/nixos/rice/emacs.nix
+
+--------------------------------------------------------------------------------
+
 * Package management
 ** Load straight
 [[https://github.com/raxod502/straight.el][straight]] is a purely functional package manager for Emacs.
